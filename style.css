@@ -1,5 +1,11 @@
-h1 {
-    color: blue;
+a, a:hover, a:focus  {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+body {
+    background-color: aliceblue;
+    font-family: 'Roboto', 'Verdana', 'sans-serif';
 }
 
 header h3, header nav {
@@ -13,6 +19,7 @@ header h3 {
 
 .jumbotron {
     background-color: #92ef95;
+    border-radius: 0 0 15px 15px !important;
 }
 
 #headerDescription {
@@ -22,7 +29,8 @@ header h3 {
 main {
     background-color: rgb(110, 157, 198);
     padding: 10px 10px 0 10px;
-    border-radius: 0 10px 0 10px;
+    border-radius: 20px;
+    margin-bottom: 100px;
 }
 
 #signupContainer {
@@ -30,7 +38,6 @@ main {
 }
 
 main h2 {
-    font-family: 'Verdana';
     display: inline-block;
     padding: 10px 30px;
     border-radius: 10px;
@@ -43,4 +50,21 @@ main .btn-success2 {
 
 #submitContainer {
     padding: 20px 0 15px 0;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: #92ef95;
+    opacity: 0.7;
+    height: 50px;
+    padding: 15px;
+    width: 100%;
+    text-align: center;
+    transition: opacity 1s;
+}
+
+footer h4 {
+    margin: 0;
 }
