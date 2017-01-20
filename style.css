@@ -1,0 +1,46 @@
+h1 {
+    color: blue;
+}
+
+header h3, header nav {
+    display: inline-block;
+}
+
+header h3 {
+    margin: 0;
+    font-style: italic;
+}
+
+.jumbotron {
+    background-color: #92ef95;
+}
+
+#headerDescription {
+    margin-top: 20px;
+}
+
+main {
+    background-color: rgb(110, 157, 198);
+    padding: 10px 10px 0 10px;
+    border-radius: 0 10px 0 10px;
+}
+
+#signupContainer {
+    text-align: center;
+}
+
+main h2 {
+    font-family: 'Verdana';
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+main .btn-success2 {
+    background: linear-gradient(to bottom,#5cb85c 0,#92ef95 100%)
+}
+
+#submitContainer {
+    padding: 20px 0 15px 0;
+}
