@@ -1,39 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		  <meta charset="UTF-8">
-		    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		      <title>Editor</title>
-		        <style type="text/css" media="screen">
-    body {
-	            overflow: hidden;
-			        }
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>REPL editor - foo.js</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <link rel="stylesheet" href="style/style.css">
+				<link rel="icon" type="image/ico" href="img/favicon.ico">
+    </head>
+    <body class="container">
+        <header class="jumbotron">
+            <h1><a href="#"><img src="img/logo.png" alt="logo" width="100" height="100"> REPL en classe</a></h1>
+            <div id="headerDescription">
+                <h3>Un REPL comme outil d'enseignment</h3>
+                <nav class="pull-right">
+                    <a href="logout.html" class="btn btn-lg btn-primary">Se déconnecter <span class="glyphicon glyphicon-log-out"></span></a>
+                </nav>
+            </div>
+        </header>
 
-        #editor {
-		        margin: 0;
-				        position: absolute;
-						        top: 0;
-								        bottom: 0;
-										        left: 0;
-												        right: 0;
-														    }
-	  </style>
-	</head>
-	<body>
+				<main class="editor">
+					<nav>
+						<div class="left-nav">
+							<span id="fileName">foo.js</span>
+						</div>
+						<div class="empty-nav"></div>
+						<div class="right-nav">
+							<button class="btn btn-info" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
+						</div>
+					</nav>
+					<pre id="editor">
+let kek = true;
 
-		<pre id="editor">function foo(items) {
-		    var i;
-		        for (i = 0; i &lt; items.length; i++) {
-			        alert("Ace Rocks " + items[i]);
-				    }
-				    }</pre>
+function hehe(wazzup) {
+    console.log(`hello ${wazzup}`);
+}
 
-		<script src="../editor/ace.js" type="text/javascript" charset="utf-8"></script>
-		<script>
-    var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/twilight");
-	    editor.session.setMode("ace/mode/javascript");
-		</script>
+hehe(kek);</pre>
+				<pre id="results"></pre>
+				</main>
+        <footer class="footer">
+            <h4>Fait à Gatineau par <a href="http://jonathanGB.com">Jonathan Guillotte-Blouin</a></h4>
+        </footer>
 
-	</body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+				<script src="../editor/ace.js" type="text/javascript" charset="utf-8"></script>
+				<script src="js/main.js"></script>
+				<script src="js/editor.js"></script>
+    </body>
 </html>

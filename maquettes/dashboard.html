@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>REPL Inscription</title>
+        <title>REPL dashboard</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
@@ -15,7 +15,7 @@
             <div id="headerDescription">
                 <h3>Un REPL comme outil d'enseignment</h3>
                 <nav class="pull-right">
-                    <a href="login.html" class="btn btn-lg btn-primary">Se connecter <span class="glyphicon glyphicon-log-in"></span></a>
+                    <a href="logout.html" class="btn btn-lg btn-primary">Se déconnecter <span class="glyphicon glyphicon-log-out"></span></a>
                 </nav>
             </div>
 
@@ -31,16 +31,16 @@
                     <input type="text" class="form-control" id="nameInput" placeholder="nom">
                 </div>
                 <div class="form-group">
+                    <label for="usernameInput">Nom d'utilisateur</label>
+                    <input type="text" class="form-control" id="usernameInput" placeholder="nom d'utilisateur">
+                </div>
+                <div class="form-group">
                     <label for="emailInput">Adresse courriel</label>
                     <input type="email" class="form-control" id="emailInput" placeholder="courriel">
                 </div>
                 <div class="form-group">
                     <label for="passwordInput">Mot de passe</label>
                     <input type="password" class="form-control" id="passwordInput" placeholder="mot de passe">
-                </div>
-                <div class="form-group">
-                    <label for="repeatPasswordInput">Répéter de passe</label>
-                    <input type="password" class="form-control" id="repeatPasswordInput" placeholder="mot de passe">
                 </div>
                 <div id="submitContainer" class="text-center">
                     <button type="submit" class="btn btn-lg btn-success text-center">Soumettre <span class="glyphicon glyphicon-send"></span></button>

@@ -1,3 +1,7 @@
+.glyphicon {
+  top: 3px;
+}
+
 a, a:hover, a:focus  {
     color: #337ab7;
     text-decoration: none;
@@ -18,6 +22,7 @@ header h3 {
 }
 
 .jumbotron {
+  padding-top: 1px;
     background-color: #92ef95;
     border-radius: 0 0 15px 15px !important;
 }
@@ -63,8 +68,46 @@ footer {
     width: 100%;
     text-align: center;
     transition: opacity 1s;
+    z-index: 4;
 }
 
 footer h4 {
     margin: 0;
+}
+
+#editor {
+  height: 400px;
+  margin: 0;
+}
+
+main.editor {
+  padding: 20px;
+}
+
+main.editor nav {
+  margin-bottom: 15px;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+main.editor nav > div {
+  display: inline-flex;
+}
+
+main.editor .empty-nav {
+  flex: 1 0;
+}
+
+#fileName {
+  color: #fff;
+  font-family: courier;
+  background-color: #92ef95;
+  font-size: 20px;
+  padding: 3px;
+  border-radius: 3px;
+}
+
+#runFile {
+  font-weight: bold;
+  font-size: 17px;
 }
