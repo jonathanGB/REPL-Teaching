@@ -33,24 +33,30 @@ header h3 {
 
 main {
     background-color: rgb(110, 157, 198);
-    padding: 10px 10px 0 10px;
+    padding: 25px;
     border-radius: 20px;
     margin-bottom: 100px;
+}
+
+main.list {
+  position: relative;
+}
+
+button.add {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 #signupContainer {
     text-align: center;
 }
 
-main h2 {
+main .header {
     display: inline-block;
     padding: 10px 30px;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.85);
-}
-
-main .btn-success2 {
-    background: linear-gradient(to bottom,#5cb85c 0,#92ef95 100%)
 }
 
 #submitContainer {
@@ -78,10 +84,6 @@ footer h4 {
 #editor {
   height: 400px;
   margin: 0;
-}
-
-main.editor {
-  padding: 20px;
 }
 
 main.editor nav {
