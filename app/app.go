@@ -7,6 +7,8 @@ import (
 
 func main() {
 	router := gin.Default()
+  router.Static("/public", "./public")
+  router.StaticFile("/favicon.ico", "./public/img/favicon.ico")
 
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello World!")
