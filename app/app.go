@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -24,13 +25,22 @@ func main() {
 	})
 
 	router.GET("/foo", func(c *gin.Context) {
-		fooObj := struct {
+		fooObjs := []struct {
 			Id  bson.ObjectId `json:"id" bson:"_id"`
 			Kek bool          `json:"topkek" bson:"kek"`
 		}{}
 
-		s.DB("repl").C("foo").Find(bson.M{}).One(&fooObj)
-		c.JSON(http.StatusOK, fooObj)
+		kekFilter, err := strconv.ParseBool(c.Query("kek"))
+
+		var queryFilter bson.M
+		if err == nil {
+			queryFilter = bson.M{
+				"kek": kekFilter,
+			}
+		}
+
+		s.DB("repl").C("foo").Find(queryFilter).All(&fooObjs)
+		c.JSON(http.StatusOK, fooObjs)
 	})
 
 	router.Run(":8080")
