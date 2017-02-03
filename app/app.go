@@ -6,9 +6,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
 	"strconv"
+	"fmt"
 )
 
-func main() {
+func getMainEngine() *gin.Engine {
 	router := gin.Default()
 	router.Static("/public", "./public")
 	router.StaticFile("/favicon.ico", "./public/img/favicon.ico")
@@ -17,7 +18,7 @@ func main() {
 	defer s.Close()
 
 	router.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello World!")
+		c.String(http.StatusOK, "Hello, World!")
 	})
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -43,7 +44,8 @@ func main() {
 		c.JSON(http.StatusOK, fooObjs)
 	})
 
-	router.Run(":8080")
+	fmt.Println("\n") // empty buffer in output
+	return router
 }
 
 func initDB() *mgo.Session {
@@ -53,4 +55,8 @@ func initDB() *mgo.Session {
 	}
 
 	return s
+}
+
+func main() {
+	getMainEngine().Run(":8080")
 }
