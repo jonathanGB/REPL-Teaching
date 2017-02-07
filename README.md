@@ -12,8 +12,19 @@ Un professeur peut déployer pour sa classe des extraits (*snippets*) de code, q
 
 #### Technologies
 * HTML & CSS
-* JavaScript (VanillaJS ou jQuery ou framework)
+* JavaScript && jQuery
 * Go (serveur)
 * WebSockets (temps-réel)
 * MongoDB (très probablement)
 * Compilateurs / interpréteurs des langages qui seront couverts par le REPL
+
+
+#### Comment déployer
+Pour déployer localement, il est nécessaire d'avoir **Go** (`GOPATH` bien configuré aussi) et **MongoDB** d'installés (le dossier par défaut pour les données doit être utilisé `/data/db`). Un script `deploy.bash` permet ensuite d'installer automatiquement les dépendances **go** du projet, configurer la base de données et lancer le tout. Ce script est écrit pour les sytèmes **UN*X**.
+
+Certains *flags* sont disponibles pour lancer le script, les voici:
+* `--install`: installer les dépendances **go**
+* `--restartDB`: réinitialiser la base de données
+
+#### Comment tester
+À partir de la ligne de commande, dirigez-vous dans le dossier **app**, puis simplement exécuter `go test`, et les tests rouleront automatiquement.

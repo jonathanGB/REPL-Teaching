@@ -4,6 +4,8 @@
 # 1. You have Go installed, and have set your GOPATH
 # 2. You have MongoDB installed, and have set the default path to data (/data/db)
 
+sudo mongod > /dev/null &
+
 for var in "$@"
 do
 	# to install Go dependencies to the project
@@ -21,5 +23,4 @@ do
 done
 
 
-sudo mongod > /dev/null &
 go run app.go
