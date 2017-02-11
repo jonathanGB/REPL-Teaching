@@ -1,17 +1,14 @@
-.glyphicon {
-  top: 3px; }
-
-a, a:hover, a:focus {
-  color: #337ab7;
-  text-decoration: none; }
-
+/* BODY */
 body {
   background-color: aliceblue;
   font-family: 'Roboto', 'Verdana', 'sans-serif'; }
 
+/* HEADER */
+#headerDescription {
+  margin-top: 20px; }
+
 header h3, header nav {
   display: inline-block; }
-
 header h3 {
   margin: 0;
   font-style: italic; }
@@ -21,51 +18,54 @@ header h3 {
   background-color: #92ef95;
   border-radius: 0 0 15px 15px !important; }
 
-#headerDescription {
-  margin-top: 20px; }
+#signupContainer {
+  text-align: center; }
 
+/* MAIN */
 main {
   background-color: #6e9dc6;
   padding: 25px;
   border-radius: 20px;
   margin-bottom: 100px; }
+  main .header {
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.85); }
 
 main.list {
   position: relative; }
+
+.glyphicon {
+  top: 3px; }
+
+a, a:hover, a:focus {
+  color: #337ab7;
+  text-decoration: none; }
+
+li {
+  list-style-type: none; }
+
+.info {
+  margin-left: 30px;
+  font-style: italic;
+  font-size: 15px; }
+
+.green {
+  color: green; }
+
+.red {
+  color: red; }
 
 button.add {
   position: absolute;
   top: 0;
   right: 0; }
 
-#signupContainer {
-  text-align: center; }
-
-main .header {
-  display: inline-block;
-  padding: 10px 30px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.85); }
-
 #submitContainer {
   padding: 20px 0 15px 0; }
 
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  background-color: #92ef95;
-  opacity: 0.7;
-  height: 50px;
-  padding: 15px;
-  width: 100%;
-  text-align: center;
-  transition: opacity 1s;
-  z-index: 4; }
-
-footer h4 {
-  margin: 0; }
-
+/* EDITOR */
 #editor {
   height: 500px;
   margin: 0; }
@@ -74,10 +74,8 @@ main.editor nav {
   margin-bottom: 15px;
   display: flex;
   flex-flow: row wrap; }
-
-main.editor nav > div {
-  display: inline-flex; }
-
+  main.editor nav > div {
+    display: inline-flex; }
 main.editor .empty-nav {
   flex: 1 0; }
 
@@ -93,18 +91,20 @@ main.editor .empty-nav {
   font-weight: bold;
   font-size: 17px; }
 
-li {
-  list-style-type: none; }
-
-.info {
-  margin-left: 30px;
-  font-style: italic;
-  font-size: 15px; }
-
-.green {
-  color: green; }
-
-.red {
-  color: red; }
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background-color: #92ef95;
+  opacity: 0.7;
+  height: 50px;
+  padding: 15px;
+  width: 100%;
+  text-align: center;
+  transition: opacity 1s;
+  z-index: 4; }
+  footer h4 {
+    margin: 0; }
 
 /*# sourceMappingURL=style.css.map */
