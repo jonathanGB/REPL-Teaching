@@ -1,0 +1,31 @@
+{{define "body"}}
+<header class="jumbotron">
+	<h1><a href="#"><img src="/public/img/logo.png" alt="logo" width="100" height="100"> REPL en classe</a></h1>
+		<div id="headerDescription">
+				<h3>Un REPL comme outil d'enseignment</h3>
+				<nav class="pull-right">
+						<a href="/" class="btn btn-lg btn-primary">S'inscrire <span class="glyphicon glyphicon-user"></span></a>
+				</nav>
+		</div>
+
+</header>
+
+<main>
+		<div id="signupContainer">
+				<h2 class="header text-center">Se connecter <span class="glyphicon glyphicon-log-in"></span></h2>
+		</div>
+		<form action="postEndpoint" method="POST">
+				<div class="form-group">
+						<label for="emailInput">Adresse courriel</label>
+						<input type="email" class="form-control" id="emailInput" placeholder="courriel">
+				</div>
+				<div class="form-group">
+						<label for="passwordInput">Mot de passe</label>
+						<input type="password" class="form-control" id="passwordInput" placeholder="mot de passe">
+				</div>
+				<div id="submitContainer" class="text-center">
+						<button type="submit" class="btn btn-lg btn-success text-center">Soumettre <span class="glyphicon glyphicon-send"></span></button>
+				</div>
+		</form>
+</main>
+{{end}}
