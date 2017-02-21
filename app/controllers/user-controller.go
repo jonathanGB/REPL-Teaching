@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"app/models"
+	"github.com/jonathanGB/REPL-Teaching/app/models"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"

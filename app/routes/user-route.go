@@ -1,7 +1,7 @@
 package route
 
 import (
-	"app/controllers"
+	"github.com/jonathanGB/REPL-Teaching/app/controllers"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"net/http"
