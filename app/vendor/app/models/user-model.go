@@ -10,11 +10,11 @@ type (
 		db *mgo.Database
 	}
 
-	User struct{
-		Id bson.ObjectId `bson:"_id"`
-		Name string `bson:"name"`
-		Email string `bson:"email"`
-		Password string `bson:"password"`
+	User struct {
+		Id       bson.ObjectId `bson:"_id"`
+		Name     string        `bson:"name"`
+		Email    string        `bson:"email"`
+		Password []byte        `bson:"password"`
 	}
 )
 

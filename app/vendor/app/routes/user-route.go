@@ -1,10 +1,10 @@
 package route
 
 import (
+	"app/controllers"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"net/http"
-	"app/controllers"
 )
 
 func UserRoutes(router *gin.Engine, s *mgo.Session) {

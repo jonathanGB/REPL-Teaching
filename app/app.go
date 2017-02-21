@@ -1,11 +1,11 @@
 package main
 
 import (
+	"app/routes"
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
-	"app/routes"
 )
 
 var s = initDB()
