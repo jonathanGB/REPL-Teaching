@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"app/models"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"net/http"
-	"app/models"
 )
 
-type UserController struct{
+type UserController struct {
 	model *models.UserModel
 }
 
@@ -23,7 +24,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	email := c.PostForm("email")
 	pwd := c.PostForm("password")
 
-	if (name == "" || email == "" || pwd == "") {
+	if name == "" || email == "" || pwd == "" {
 		c.HTML(http.StatusBadRequest, "signup", gin.H{
 			"title": "Sign up",
 			"error": "Paramètre absent",
@@ -33,24 +34,35 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 
 	// check for email duplicate, then add to db
 	if alreadyIn := uc.model.IsThere(email); !alreadyIn {
+		hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "signup", gin.H{
+				"title": "Sign up",
+				"error": "Erreur lors de la création du compte",
+				"name":  name,
+				"email": email,
+			})
+			return
+		}
+
 		user := models.User{
 			bson.NewObjectId(),
 			name,
 			email,
-			pwd,
+			hashedPwd,
 		}
 
 		if err := uc.model.AddUser(&user); err == nil {
 			// show success message
 			c.HTML(http.StatusOK, "signedup", gin.H{
 				"title": "Signed up",
-				"name": name,
+				"name":  name,
 			})
 		} else {
 			c.HTML(http.StatusInternalServerError, "signup", gin.H{
 				"title": "Sign up",
 				"error": "Erreur lors de la création du compte",
-				"name": name,
+				"name":  name,
 				"email": email,
 			})
 		}
@@ -58,9 +70,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "signup", gin.H{
 			"title": "Sign up",
 			"error": "Email déjà utilisé",
-			"name": name,
+			"name":  name,
 		})
 	}
-
-	//c.String(http.StatusOK, fmt.Sprintf("Nom: %s\nEmail: %s\nPassword: %s", name, email, pwd))
 }

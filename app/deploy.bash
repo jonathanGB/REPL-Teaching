@@ -13,7 +13,8 @@ do
 		echo "Installing go-gin" && go get gopkg.in/gin-gonic/gin.v1 &&
 		echo "Installing gin/multitemplate" && go get github.com/gin-contrib/multitemplate &&
 		echo "Installing mgo.v2" && go get gopkg.in/mgo.v2 &&
-		echo "Installing bson"   && go get gopkg.in/mgo.v2/bson
+		echo "Installing bson"   && go get gopkg.in/mgo.v2/bson &&
+		echo "Installing bcrypt" && go get golang.org/x/crypto/bcrypt
 	fi
 
 	# to restart the database (creates by default a "foo" collection)
