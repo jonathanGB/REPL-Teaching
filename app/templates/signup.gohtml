@@ -10,26 +10,33 @@
 
 </header>
 
+{{if .error}}
+	<div class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<strong>Erreur!</strong> {{.error}}
+	</div>
+{{end}}
+
 <main>
 		<div id="signupContainer">
 				<h2 class="header text-center">S'inscrire <span class="glyphicon glyphicon-user"></span></h2>
 		</div>
-		<form action="postEndpoint" method="POST">
+		<form id="createUser" action="/users" method="POST">
 				<div class="form-group">
 						<label for="nameInput">Nom</label>
-						<input type="text" class="form-control" id="nameInput" placeholder="nom">
+						<input type="text" class="form-control" id="nameInput" name="name" placeholder="nom" value="{{.name}}" required>
 				</div>
 				<div class="form-group">
 						<label for="emailInput">Adresse courriel</label>
-						<input type="email" class="form-control" id="emailInput" placeholder="courriel">
+						<input type="email" class="form-control" id="emailInput" name="email" placeholder="courriel" value="{{.email}}" required>
 				</div>
 				<div class="form-group">
 						<label for="passwordInput">Mot de passe</label>
-						<input type="password" class="form-control" id="passwordInput" placeholder="mot de passe">
+						<input type="password" class="form-control" id="passwordInput" name="password" placeholder="mot de passe" required>
 				</div>
 				<div class="form-group">
 						<label for="repeatPasswordInput">Répéter de passe</label>
-						<input type="password" class="form-control" id="repeatPasswordInput" placeholder="mot de passe">
+						<input type="password" class="form-control" id="repeatPasswordInput" placeholder="mot de passe" required>
 				</div>
 				<div id="submitContainer" class="text-center">
 						<button type="submit" class="btn btn-lg btn-success text-center">Soumettre <span class="glyphicon glyphicon-send"></span></button>

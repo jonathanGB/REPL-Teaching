@@ -1,0 +1,13 @@
+{{define "body"}}
+<header class="jumbotron">
+	<h1><a href="#"><img src="/public/img/logo.png" alt="logo" width="100" height="100"> REPL en classe</a></h1>
+		<div id="headerDescription">
+				<h3>Un REPL comme outil d'enseignment</h3>
+				<nav class="pull-right">
+						<a href="/login" class="btn btn-lg btn-primary">Se connecter <span class="glyphicon glyphicon-log-in"></span></a>
+				</nav>
+		</div>
+</header>
+
+<h2 class="alert alert-info text-center">Bonjour {{.name}}, votre compte est créé! 👋</h2>
+{{end}}
