@@ -5,9 +5,7 @@ import (
 	"github.com/gin-contrib/multitemplate"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-	"net/http"
-	"strconv"
+	"app/routes"
 )
 
 var s = initDB()
@@ -23,55 +21,18 @@ func templateRender() multitemplate.Render {
 }
 
 func getMainEngine() *gin.Engine {
-	router := gin.Default()
-	router.Static("/public", "./public")
-	router.StaticFile("/favicon.ico", "./public/img/favicon.ico")
-	router.HTMLRender = templateRender()
+	app := gin.Default()
+	app.Static("/public", "./public")
+	app.StaticFile("/favicon.ico", "./public/img/favicon.ico")
+	app.HTMLRender = templateRender()
 
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "signup", gin.H{
-			"title": "signup",
-		})
-	})
-
-	router.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login", gin.H{
-			"title": "login",
-		})
-	})
-
-	router.GET("/logout", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "logout", gin.H{
-			"title": "logout",
-			"name":  "user1234",
-		})
-	})
-
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
-	router.GET("/foo", func(c *gin.Context) {
-		fooObjs := []struct {
-			Id  bson.ObjectId `json:"id" bson:"_id"`
-			Kek bool          `json:"topkek" bson:"kek"`
-		}{}
-
-		kekFilter, err := strconv.ParseBool(c.Query("kek"))
-
-		var queryFilter bson.M
-		if err == nil {
-			queryFilter = bson.M{
-				"kek": kekFilter,
-			}
-		}
-
-		s.DB("repl").C("foo").Find(queryFilter).All(&fooObjs)
-		c.JSON(http.StatusOK, fooObjs)
-	})
+	// add routes
+	route.FooBarRoutes(app, s)
+	route.UserRoutes(app)
+	route.GroupRoutes(app)
 
 	fmt.Println("\n") // empty buffer in output
-	return router
+	return app
 }
 
 func initDB() *mgo.Session {
