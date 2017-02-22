@@ -14,7 +14,8 @@ do
 		echo "Installing gin/multitemplate" && go get github.com/gin-contrib/multitemplate &&
 		echo "Installing mgo.v2" && go get gopkg.in/mgo.v2 &&
 		echo "Installing bson"   && go get gopkg.in/mgo.v2/bson &&
-		echo "Installing bcrypt" && go get golang.org/x/crypto/bcrypt
+		echo "Installing bcrypt" && go get golang.org/x/crypto/bcrypt &&
+		echo "Installing jwt" && go get github.com/dgrijalva/jwt-go
 	fi
 
 	# to restart the database (creates by default a "foo" collection)
