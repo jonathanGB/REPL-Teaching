@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/jonathanGB/REPL-Teaching/app/routes"
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
+	"github.com/jonathanGB/REPL-Teaching/app/routes"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 )
