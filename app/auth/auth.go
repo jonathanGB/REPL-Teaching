@@ -1,29 +1,29 @@
 package auth
 
 import (
-	"gopkg.in/gin-gonic/gin.v1"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2/bson"
+	"net/http"
 	"os"
 	"time"
-	"fmt"
-	"net/http"
 )
 
 var JWT_SECRET []byte = []byte(os.Getenv("JWT_SECRET"))
 
 type PublicUser struct {
-	Id bson.ObjectId
+	Id   bson.ObjectId
 	Name string
 	Role string
 }
 
 func MarshalToken(name, id, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":     id,
-		"name":   name,
-		"role":   role,
-		"exp": time.Now().Add(time.Hour).Unix(),
+		"id":   id,
+		"name": name,
+		"role": role,
+		"exp":  time.Now().Add(time.Hour).Unix(),
 	})
 
 	return token.SignedString(JWT_SECRET)
@@ -31,25 +31,25 @@ func MarshalToken(name, id, role string) (string, error) {
 
 func unMarshalToken(tokenStr string) (*PublicUser, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-    // Don't forget to validate the alg is what you expect:
-    if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-        return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-    }
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
 
-    return JWT_SECRET, nil
+		return JWT_SECRET, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("Problem with the JWT")
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-	    return &PublicUser{
-				bson.ObjectIdHex(claims["id"].(string)),
-				claims["name"].(string),
-				claims["role"].(string),
-			}, nil
+		return &PublicUser{
+			bson.ObjectIdHex(claims["id"].(string)),
+			claims["name"].(string),
+			claims["role"].(string),
+		}, nil
 	} else {
-	    return nil, fmt.Errorf("Problem with the JWT")
+		return nil, fmt.Errorf("Problem with the JWT")
 	}
 }
 

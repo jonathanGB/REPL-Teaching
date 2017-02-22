@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-const MAX_AGE int = 3600 * 24
+const MAX_AGE int = 3600 // 1h
 
 type UserController struct {
 	model *models.UserModel

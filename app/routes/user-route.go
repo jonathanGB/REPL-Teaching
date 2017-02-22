@@ -1,12 +1,11 @@
 package route
 
 import (
-	"github.com/jonathanGB/REPL-Teaching/app/controllers"
 	"github.com/jonathanGB/REPL-Teaching/app/auth"
+	"github.com/jonathanGB/REPL-Teaching/app/controllers"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"net/http"
-	"fmt"
 )
 
 func UserRoutes(router *gin.Engine, s *mgo.Session) {
