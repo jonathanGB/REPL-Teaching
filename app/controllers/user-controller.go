@@ -55,6 +55,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 			name,
 			email,
 			role,
+			[]bson.ObjectId{},
 			hashedPwd,
 		}
 

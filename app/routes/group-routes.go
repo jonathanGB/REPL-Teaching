@@ -1,15 +1,18 @@
 package route
 
 import (
+	"github.com/jonathanGB/REPL-Teaching/app/auth"
+	"github.com/jonathanGB/REPL-Teaching/app/controllers"
 	"gopkg.in/gin-gonic/gin.v1"
-	"net/http"
+	"gopkg.in/mgo.v2"
+	//"net/http"
 )
 
-func GroupRoutes(router *gin.Engine) {
-	g := router.Group("/groups")
+func GroupRoutes(router *gin.Engine, s *mgo.Session) {
+	gc := controllers.NewGroupController(s)
+
+	g := router.Group("/groups", auth.IsAuthentified)
 	{
-		g.GET("/", func(c *gin.Context) {
-			c.String(http.StatusOK, "in construction")
-		})
+		g.GET("/", gc.FindGroups)
 	}
 }

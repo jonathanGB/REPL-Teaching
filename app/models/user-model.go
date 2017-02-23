@@ -12,11 +12,12 @@ type (
 	}
 
 	User struct {
-		Id       bson.ObjectId `bson:"_id"`
-		Name     string        `bson:"name"`
-		Email    string        `bson:"email"`
-		Role     string        `bson:"role"`
-		Password []byte        `bson:"password"`
+		Id       bson.ObjectId   `bson:"_id"`
+		Name     string          `bson:"name"`
+		Email    string          `bson:"email"`
+		Role     string          `bson:"role"`
+		Groups   []bson.ObjectId `bson:"groups"`
+		Password []byte          `bson:"password"`
 	}
 )
 

@@ -17,6 +17,7 @@ func templateRender() multitemplate.Render {
 	r.AddFromFiles("login", "templates/layout.gohtml", "templates/login.gohtml")
 	r.AddFromFiles("logout", "templates/layout.gohtml", "templates/logout.gohtml")
 	r.AddFromFiles("signedup", "templates/layout.gohtml", "templates/signedup.gohtml")
+	r.AddFromFiles("user-groups", "templates/layout.gohtml", "templates/user-groups.gohtml")
 
 	return r
 }
@@ -30,7 +31,7 @@ func getMainEngine() *gin.Engine {
 	// add routes
 	route.FooBarRoutes(app, s)
 	route.UserRoutes(app, s)
-	route.GroupRoutes(app)
+	route.GroupRoutes(app, s)
 
 	fmt.Println("\n") // empty buffer in output
 	return app
