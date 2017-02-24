@@ -29,9 +29,9 @@ func getMainEngine() *gin.Engine {
 	app.HTMLRender = templateRender()
 
 	// add routes
-	route.FooBarRoutes(app, s)
-	route.UserRoutes(app, s)
-	route.GroupRoutes(app, s)
+	routes.FooBarRoutes(app, s)
+	routes.UserRoutes(app, s)
+	routes.GroupRoutes(app, s)
 
 	fmt.Println("\n") // empty buffer in output
 	return app

@@ -1,4 +1,4 @@
-package route
+package routes
 
 import (
 	"gopkg.in/gin-gonic/gin.v1"

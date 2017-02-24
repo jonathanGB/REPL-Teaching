@@ -27,8 +27,8 @@ func (gc *GroupController) FindGroups(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "user-groups", gin.H{
 		"title": "groups dashboard",
-		"user": user,
-		"data": groups,
+		"user":  user,
+		"data":  groups,
 	})
 }
 
@@ -69,7 +69,7 @@ func (gc *GroupController) CreateGroup(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error": nil,
-			"data": gId,
+			"data":  gId,
 		})
 	}
 }

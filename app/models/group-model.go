@@ -21,20 +21,19 @@ type (
 	}
 
 	RenderedGroup struct {
-		Id string
-		Name string
+		Id          string
+		Name        string
 		TeacherName string
-		FilesLen int
+		FilesLen    int
 	}
 )
-
 
 func NewGroupModel(s *mgo.Session) *GroupModel {
 	return &GroupModel{s.DB("repl")}
 }
 
 func (gm *GroupModel) GetUserGroups(userId bson.ObjectId) []RenderedGroup {
-	userGroups := struct{
+	userGroups := struct {
 		GroupIDs []bson.ObjectId `bson:"groups"`
 	}{}
 	groups := []Group{}
@@ -58,7 +57,7 @@ func (gm *GroupModel) GetUserGroups(userId bson.ObjectId) []RenderedGroup {
 }
 
 func (gm *GroupModel) IsThereGroup(gName string, userId bson.ObjectId) bool {
-	result := struct{
+	result := struct {
 		Id bson.ObjectId `bson:"_id"`
 	}{}
 
