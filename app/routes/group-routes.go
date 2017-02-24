@@ -14,5 +14,6 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 	g := router.Group("/groups", auth.IsAuthentified)
 	{
 		g.GET("/", gc.FindGroups)
+		g.POST("/", auth.IsProf("json"), gc.CreateGroup)
 	}
 }

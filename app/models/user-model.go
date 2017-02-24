@@ -25,7 +25,7 @@ func NewUserModel(s *mgo.Session) *UserModel {
 	return &UserModel{s.DB("repl")}
 }
 
-func (um *UserModel) IsThere(email string) bool {
+func (um *UserModel) IsThereUser(email string) bool {
 	result := new(User)
 
 	um.db.C("users").Find(bson.M{"email": email}).One(result)
@@ -34,7 +34,7 @@ func (um *UserModel) IsThere(email string) bool {
 }
 
 func (um *UserModel) AddUser(user *User) error {
-	return um.db.C("users").Insert(*user)
+	return um.db.C("users").Insert(user)
 }
 
 func (um *UserModel) FindOne(email, pwd string) (result *User, err error) {

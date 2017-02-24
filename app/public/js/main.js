@@ -12,6 +12,33 @@ $(function() {
 				e.preventDefault()
 			}
 		})
+
+		$('#createGroup').submit(function(e) {
+			e.preventDefault()
+
+			fetch("/groups/", {
+				method: "POST",
+				credentials: "include",
+				body: new FormData(document.getElementById('createGroup'))
+			})
+			.then(response => response.json())
+			.then(payload => {
+				if (payload.error) {
+					toastr.error(payload.error)
+				} else {
+					toastr.success('Groupe créé!')
+
+					// TODO: show more info in LIs?
+					$('#groupsList').append(
+						`<li>
+							<a href="/groups/${payload.data}"><h3>${$('#groupName').val().trim()}</h3></a>
+						</li>`
+					)
+
+					$('#createGroupModal').modal('hide')
+				}
+			})
+		})
 })
 
 

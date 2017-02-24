@@ -38,7 +38,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	}
 
 	// check for email duplicate, then add to db
-	if alreadyIn := uc.model.IsThere(email); !alreadyIn {
+	if alreadyIn := uc.model.IsThereUser(email); !alreadyIn {
 		hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "signup", gin.H{

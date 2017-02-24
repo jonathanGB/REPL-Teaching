@@ -34,11 +34,11 @@ func UserRoutes(router *gin.Engine, s *mgo.Session) {
 		u.POST("/login", uc.LoginUser)
 
 		u.GET("/logout", auth.IsAuthentified, auth.DeleteAuthCookie, func(c *gin.Context) {
-			user, _ := c.Get("user")
+			user := c.MustGet("user").(*auth.PublicUser)
 
 			c.HTML(http.StatusOK, "logout", gin.H{
 				"title": "logout",
-				"name":  user.(*auth.PublicUser).Name,
+				"name":  user.Name,
 			})
 		})
 	}

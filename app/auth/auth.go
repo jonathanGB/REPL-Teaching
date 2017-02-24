@@ -72,6 +72,25 @@ func IsAuthentified(c *gin.Context) {
 	c.Next()
 }
 
+func IsProf(responseType string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user := c.MustGet("user").(*PublicUser)
+
+		if user.Role == "teacher" {
+			c.Next()
+		} else {
+			c.Abort()
+
+			if responseType == "json" {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": "unauthorized",
+				})
+			}
+			// TODO: add else case if need to handle HTML rendering
+		}
+	}
+}
+
 func DeleteAuthCookie(c *gin.Context) {
 	c.SetCookie("auth", "", -1, "", "", os.Getenv("env") == "prod", true)
 	c.Next()

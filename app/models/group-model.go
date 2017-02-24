@@ -56,3 +56,17 @@ func (gm *GroupModel) GetUserGroups(userId bson.ObjectId) []RenderedGroup {
 
 	return rGroups
 }
+
+func (gm *GroupModel) IsThereGroup(gName string, userId bson.ObjectId) bool {
+	result := struct{
+		Id bson.ObjectId `bson:"_id"`
+	}{}
+
+	gm.db.C("groups").Find(bson.M{"teacher": userId, "name": gName}).Select(bson.M{"_id": 1}).One(&result)
+
+	return result.Id != ""
+}
+
+func (gm *GroupModel) AddGroup(group *Group) error {
+	return gm.db.C("groups").Insert(group)
+}

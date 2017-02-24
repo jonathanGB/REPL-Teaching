@@ -11,12 +11,38 @@
 
 <main class="groups-list list">
 	{{if eq .user.Role "teacher"}}
-		<button class="btn btn-lg btn-success add">Nouveau groupe <span class="glyphicon glyphicon-plus"></span></button>
+		<div class="modal fade" tabindex="-1" role="dialog" id="createGroupModal">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title">Créer un groupe</h4>
+		      </div>
+					<form id="createGroup" class="" action="" method="POST"> <!-- sent via AJAX -->
+			      <div class="modal-body">
+							<div class="form-group">
+						    <label for="groupName">Nom du groupe</label>
+						    <input type="text" class="form-control" id="groupName" name="groupName" placeholder="Nom de groupe" required>
+						  </div>
+							<div class="form-group">
+								<label for="groupPassword">Mot de passe du groupe</label>
+								<input type="password" class="form-control" id="groupPassword" name="groupPassword" placeholder="Mot de passe du groupe" required>
+							</div>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="submit" class="btn btn-primary">Créer</button>
+			      </div>
+					</form>
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+		<button class="btn btn-lg btn-success add" data-toggle="modal" data-target="#createGroupModal">Nouveau groupe <span class="glyphicon glyphicon-plus"></span></button>
 	{{end}}
 	<div class="text-center">
-		<h2 class="header">Groupes</h2>
+		<h2 class="header">Groupes <span class="glyphicon glyphicon-home"></span></h2>
 	</div>
-	<ul>
+	<ul id="groupsList">
 		{{range .data}}
 			<li>
 				<a href="/groups/{{.Id}}" data-info="{{.TeacherName}} - {{.FilesLen}}"><h3>{{.Name}}</h3></a>
