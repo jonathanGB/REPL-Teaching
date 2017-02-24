@@ -66,6 +66,15 @@ func (gm *GroupModel) IsThereGroup(gName string, userId bson.ObjectId) bool {
 	return result.Id != ""
 }
 
-func (gm *GroupModel) AddGroup(group *Group) error {
-	return gm.db.C("groups").Insert(group)
+func (gm *GroupModel) AddGroup(group *Group, userId bson.ObjectId) error {
+	if err := gm.db.C("groups").Insert(group); err != nil {
+		return err
+	}
+
+	return gm.db.C("users").Update(
+		bson.M{"_id": userId},
+		bson.M{
+			"$push": bson.M{"groups": group.Id},
+		},
+	)
 }

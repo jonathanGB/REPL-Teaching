@@ -62,7 +62,7 @@ func (gc *GroupController) CreateGroup(c *gin.Context) {
 		hashedPwd,
 	}
 
-	if err := gc.model.AddGroup(&group); err != nil {
+	if err := gc.model.AddGroup(&group, user.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur lors de la création du groupe",
 		})
