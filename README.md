@@ -13,9 +13,9 @@ Un professeur peut déployer pour sa classe des extraits (*snippets*) de code, q
 #### Technologies
 * HTML & CSS
 * JavaScript && jQuery
-* Go (serveur)
+* Go (serveur) + Micro-framework Gin
 * WebSockets (temps-réel)
-* MongoDB (très probablement)
+* MongoDB (base de données)
 * Compilateurs / interpréteurs des langages qui seront couverts par le REPL
 
 
