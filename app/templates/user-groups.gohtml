@@ -28,6 +28,10 @@
 								<label for="groupPassword">Mot de passe du groupe</label>
 								<input type="password" class="form-control" id="groupPassword" name="groupPassword" placeholder="Mot de passe du groupe" required>
 							</div>
+							<div class="form-group">
+								<label for="groupPassword">Répéter mot de passe du groupe</label>
+								<input type="password" class="form-control" id="rGroupPassword" name="rGroupPassword" placeholder="Mot de passe du groupe" required>
+							</div>
 			      </div>
 			      <div class="modal-footer">
 			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -45,7 +49,7 @@
 	<ul id="groupsList">
 		{{range .data}}
 			<li>
-				<a href="/groups/{{.Id}}" data-info="{{.TeacherName}} - {{.FilesLen}}"><h3>{{.Name}}</h3></a>
+				<a href="/groups/{{.Id}}/files" data-info="{{.TeacherName}} - {{.FilesLen}}"><h3>{{.Name}}</h3></a>
 			</li>
 		{{end}}
 	</ul>

@@ -72,11 +72,11 @@ func IsAuthentified(c *gin.Context) {
 	c.Next()
 }
 
-func IsProf(responseType string) gin.HandlerFunc {
+func IsProf(status bool, responseType string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := c.MustGet("user").(*PublicUser)
 
-		if user.Role == "teacher" {
+		if user.Role == "teacher" && status || user.Role != "teacher" && !status {
 			c.Next()
 		} else {
 			c.Abort()
@@ -85,8 +85,9 @@ func IsProf(responseType string) gin.HandlerFunc {
 				c.JSON(http.StatusUnauthorized, gin.H{
 					"error": "unauthorized",
 				})
+			} else {
+				c.Redirect(http.StatusSeeOther, "/groups")
 			}
-			// TODO: add else case if need to handle HTML rendering
 		}
 	}
 }

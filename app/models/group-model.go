@@ -20,6 +20,14 @@ type (
 		Password    []byte        `bson:"password"`
 	}
 
+	GroupInfo struct {
+		Id          bson.ObjectId `bson:"_id"`
+		Name        string        `bson:"name"`
+		Teacher     bson.ObjectId `bson:"teacher"`
+		TeacherName string        `bson:"teacher-name"`
+		Password    []byte        `bson:"password"`
+	}
+
 	RenderedGroup struct {
 		Id          string
 		Name        string
@@ -66,15 +74,27 @@ func (gm *GroupModel) IsThereGroup(gName string, userId bson.ObjectId) bool {
 	return result.Id != ""
 }
 
+func (gm *GroupModel) GetGroupInfo(gId bson.ObjectId) *GroupInfo {
+	result := GroupInfo{}
+
+	gm.db.C("groups").Find(bson.M{"_id": gId}).Select(bson.M{"files": 0}).One(&result)
+
+	return &result
+}
+
 func (gm *GroupModel) AddGroup(group *Group, userId bson.ObjectId) error {
 	if err := gm.db.C("groups").Insert(group); err != nil {
 		return err
 	}
 
+	return gm.JoinGroup(group.Id, userId)
+}
+
+func (gm *GroupModel) JoinGroup(gId, userId bson.ObjectId) error {
 	return gm.db.C("users").Update(
 		bson.M{"_id": userId},
 		bson.M{
-			"$push": bson.M{"groups": group.Id},
+			"$push": bson.M{"groups": gId},
 		},
 	)
 }

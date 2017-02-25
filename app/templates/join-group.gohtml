@@ -1,0 +1,25 @@
+{{define "body"}}
+<header class="jumbotron">
+		<h1><a href="#"><img src="/public/img/logo.png" alt="logo" width="100" height="100"> REPL en classe</a></h1>
+		<div id="headerDescription">
+				<h3>Un REPL comme outil d'enseignment</h3>
+				<nav class="pull-right">
+						<a href="/users/logout" class="btn btn-lg btn-primary">Se déconnecter <span class="glyphicon glyphicon-log-out"></span></a>
+				</nav>
+		</div>
+</header>
+
+<main>
+	<div class="text-center">
+		<h2 class="header">Joindre {{.group.Name}} <span class="glyphicon glyphicon-transfer"></span></h2>
+		<!-- TODO: ajouter plus d'info -->
+	</div>
+	<form id="joinGroup" class="" action="" method="POST" data-groupid="{{.group.Id}}"> <!-- sent via AJAX -->
+		<div class="form-group">
+			<label for="groupPassword">Mot de passe du groupe</label>
+			<input type="password" class="form-control" id="groupPassword" name="groupPassword" placeholder="Mot de passe du groupe" required>
+		</div>
+		<button type="submit" class="btn btn-primary">Créer</button>
+	</form>
+</main>
+{{end}}

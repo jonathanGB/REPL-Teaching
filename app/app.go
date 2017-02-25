@@ -18,6 +18,7 @@ func templateRender() multitemplate.Render {
 	r.AddFromFiles("logout", "templates/layout.gohtml", "templates/logout.gohtml")
 	r.AddFromFiles("signedup", "templates/layout.gohtml", "templates/signedup.gohtml")
 	r.AddFromFiles("user-groups", "templates/layout.gohtml", "templates/user-groups.gohtml")
+	r.AddFromFiles("join-group", "templates/layout.gohtml", "templates/join-group.gohtml")
 
 	return r
 }
