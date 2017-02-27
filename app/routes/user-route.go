@@ -11,10 +11,8 @@ import (
 func UserRoutes(router *gin.Engine, s *mgo.Session) {
 	uc := controllers.NewUserController(s)
 
-	router.GET("/", func(c *gin.Context) {
-		// TODO: if authentified, go to /groups/
-		// else, go to /users/signup
-		c.Redirect(http.StatusSeeOther, "/users/signup/")
+	router.GET("/", auth.IsAuthentified, func(c *gin.Context) {
+		c.Redirect(http.StatusSeeOther, "/groups")
 	})
 
 	u := router.Group("/users")

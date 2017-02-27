@@ -56,7 +56,7 @@ func unMarshalToken(tokenStr string) (*PublicUser, error) {
 func IsAuthentified(c *gin.Context) {
 	auth, err := c.Cookie("auth")
 	if err != nil {
-		c.Redirect(http.StatusSeeOther, "/")
+		c.Redirect(http.StatusSeeOther, "/users/signup")
 		c.Abort()
 		return
 	}
