@@ -49,7 +49,16 @@
 	<ul id="groupsList">
 		{{range .data}}
 			<li>
-				<a href="/groups/{{.Id}}/files" data-info="{{.TeacherName}} - {{.FilesLen}}"><h3>{{.Name}}</h3></a>
+				<a href="/groups/{{.Id}}/files">
+					<div class="group">
+						<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
+						<h3>{{.Name}}</h3>
+						{{if eq $.user.Role "student"}}
+							Prof: {{.TeacherName}} <br>
+						{{end}}
+						Fichiers: {{.FilesLen}}
+					</div>
+				</a>
 			</li>
 		{{end}}
 	</ul>

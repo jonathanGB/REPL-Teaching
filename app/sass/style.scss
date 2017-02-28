@@ -41,9 +41,44 @@ main {
 
 		.header {
 		    display: inline-block;
-		    padding: 10px 30px;
-		    border-radius: 10px;
-		    background: rgba(255, 255, 255, 0.85);
+				margin-bottom: 40px;
+		}
+
+		.header, .group {
+			padding: 10px 30px;
+			border-radius: 10px;
+			background: rgba(255, 255, 255, 0.85);
+		}
+
+		.group {
+			margin: 0 auto 20px auto;
+			position: relative;
+			padding-left: 80px;
+			text-align: center;
+			width: 350px;
+			min-height: 86px;
+		}
+
+		.group:hover .group-chevron {
+			transform: translateY(-50%);
+		}
+
+		.group-chevron {
+			position: absolute;
+			top: 50%;
+			left: 20px;
+			transform: translateY(-50%) rotateZ(-90deg);
+			font-size: 55px;
+			transition: transform 0.5s;
+		}
+
+		#groupsList {
+			padding-left: 0;
+		}
+
+		.group h3 {
+			margin-top: 10px;
+			color: black;
 		}
 }
 
