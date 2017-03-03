@@ -11,6 +11,7 @@ import (
 
 func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 	gc := controllers.NewGroupController(s)
+	fc := controllers.NewFileController(s)
 
 	groups := router.Group("/groups", auth.IsAuthentified)
 	{
@@ -29,10 +30,11 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 
 			// TODO: dummy response for now
 			group.GET("/files", gc.IsGroupMember(true), func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"data": c.Param("groupId"),
+				c.HTML(http.StatusOK, "user-files", gin.H{
+					"title": "Files list",
 				})
 			})
+			group.POST("/files", gc.IsGroupMember(true), fc.CreateFile)
 		}
 	}
 }

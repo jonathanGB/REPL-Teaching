@@ -23,20 +23,19 @@
 * `POST /groups/:groupId/join` : joindre un groupe (via **AJAX**)
 
 
+* `GET /groups/:groupId/files` : voir tous les fichiers du groupe (visible pour l'utiliateur)
+* `POST /groups/:groupId/files` : créer un nouveau fichier **EN CONSTRUCTION**
+
+
 *Routes non-complétées*
 
 * `GET /groups/:groupId` : dashboard pour un groupe précis, limité aux professeurs
-
-* `GET /groups/:groupId/files` : voir tous les fichiers du groupe (visible pour l'utiliateur)
 
 
 * `GET /groups/:groupId/files/:fileId` : vue d'éditeur du fichier (si l'étudiant n'a pas déjà ce fichier, redirigé vers le endpoint pour clôner)
 
 
 * `POST /groups/:groupId/files/:fileId` : clôner le fichier **:fileId**
-
-
-* `POST /groups/:groupId/files/` : créer un nouveau fichier
 
 
 * `GET /groups/:groupId/files/:fileId/run` : rouler un fichier (ou méthode de la communication websockets?)

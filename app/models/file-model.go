@@ -21,3 +21,7 @@ type (
 		IsPrivate bool          `bson:"isPrivate"`
 	}
 )
+
+func NewFileModel(s *mgo.Session) *FileModel {
+	return &FileModel{s.DB("repl")}
+}
