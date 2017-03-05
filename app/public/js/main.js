@@ -62,6 +62,52 @@ $(function() {
 				}
 			})
 		})
+
+		$('input, select').change(function(e) {
+			$(this).addClass('dirty')
+		})
+
+		// try to auto-fill fileName and fileExtension if they haven't been modified yet by the user
+		$('#fileContentInput').change(function(e) {
+			const ALLOWED_EXTENSIONS = ["go", "js"]
+			let fileName = $(this)[0].files[0].name
+			let fileExtension = fileName.match(/\.(\w+)$/)[1]
+
+			if (!$('#fileNameInput').hasClass('dirty')) {
+				$('#fileNameInput').val(fileName)
+			}
+
+			if (fileExtension && ALLOWED_EXTENSIONS.includes(fileExtension) && !$('#fileExtensionInput').hasClass('dirty')) {
+				$('#fileExtensionInput').val(fileExtension)
+			}
+		})
+
+		$('#createFile').submit(function(e) {
+			const MAX_FILE_SIZE = 10000 // 10kB
+			e.preventDefault()
+
+			let gId = $(this).data('groupid')
+
+			if ($('#fileContentInput')[0].files[0].size > MAX_FILE_SIZE) {
+				toastr.error('Les fichiers ne peuvent pas dépasser 10kB')
+				return
+			}
+
+			fetch(`/groups/${gId}/files`, {
+				method: "POST",
+				credentials: "include",
+				body: new FormData(document.getElementById('createFile'))
+			})
+			.then(response => response.json())
+			.then(payload => {
+				if (payload.error) {
+					toastr.error(payload.error)
+				} else {
+					console.log("yes")
+					//location.replace(payload.redirect)
+				}
+			})
+		})
 })
 
 

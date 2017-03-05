@@ -29,11 +29,7 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 			group.POST("/join", auth.IsProf(false, "json"), gc.IsGroupMember(false), gc.JoinGroup)
 
 			// TODO: dummy response for now
-			group.GET("/files", gc.IsGroupMember(true), func(c *gin.Context) {
-				c.HTML(http.StatusOK, "user-files", gin.H{
-					"title": "Files list",
-				})
-			})
+			group.GET("/files", gc.IsGroupMember(true), fc.ShowGroupFiles)
 			group.POST("/files", gc.IsGroupMember(true), fc.CreateFile)
 		}
 	}

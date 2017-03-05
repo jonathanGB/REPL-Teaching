@@ -21,6 +21,18 @@ func NewFileController(s *mgo.Session) *FileController {
 	}
 }
 
+// TODO: complete getting files from db
+func (fc *FileController) ShowGroupFiles(c *gin.Context) {
+	gInfo := c.MustGet("group").(*models.GroupInfo)
+
+	c.HTML(http.StatusOK, "user-files", gin.H{
+		"title": "Files list",
+		"group": gin.H{
+			"Id": gInfo.Id.Hex(),
+		},
+	})
+}
+
 func (fc *FileController) CreateFile(c *gin.Context) {
 	// get multi-part file
 	// verify extension & size

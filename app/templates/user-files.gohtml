@@ -17,12 +17,19 @@
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 	        <h4 class="modal-title">Créer un fichier</h4>
 	      </div>
-				<form id="createFile" class="" action="" method="POST"> <!-- sent via AJAX -->
+				<form id="createFile" class="" action="" method="POST" data-groupid="{{.group.Id}}"> <!-- sent via AJAX -->
 		      <div class="modal-body">
 						<div class="form-group">
 					    <label for="fileNameInput">Nom du fichier</label>
 					    <input type="text" class="form-control" id="fileNameInput" name="fileName" placeholder="Nom de fichier" required>
 					  </div>
+						<div class="form-group">
+							<label for="fileExtensionInput">Extension du fichier</label>
+							<select class="form-control" id="fileExtensionInput">
+							  <option>js</option>
+							  <option>go</option>
+							</select>
+						</div>
 						<input type="file" id="fileContentInput" name="fileContent" required>
 						<div class="form-group">
 							<div class="radio">
@@ -49,7 +56,7 @@
 	</div><!-- /.modal -->
 	<button class="btn btn-lg btn-success add" data-toggle="modal" data-target="#createFileModal">Nouveau fichier <span class="glyphicon glyphicon-plus"></span></button>
 	<div class="text-center">
-		<h2 class="header">Fichiers <span class="glyphicon glyphicon-home"></span></h2>
+		<h2 class="header">Fichiers <span class="glyphicon glyphicon-file"></span></h2>
 	</div>
 	<ul id="filesList">
 		<!-- TODO: update templating loop
