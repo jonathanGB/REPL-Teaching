@@ -1,3 +1,6 @@
+const ALLOWED_EXTENSIONS = new Set(["go", "js"])
+
+
 $(function() {
     // at the beginning
     updateFooterOpacity()
@@ -69,7 +72,6 @@ $(function() {
 
 		// try to auto-fill fileName and fileExtension if they haven't been modified yet by the user
 		$('#fileContentInput').change(function(e) {
-			const ALLOWED_EXTENSIONS = ["go", "js"]
 			let fileName = $(this)[0].files[0].name
 			let fileExtension = fileName.match(/\.(\w+)$/)[1]
 
@@ -77,7 +79,7 @@ $(function() {
 				$('#fileNameInput').val(fileName)
 			}
 
-			if (fileExtension && ALLOWED_EXTENSIONS.includes(fileExtension) && !$('#fileExtensionInput').hasClass('dirty')) {
+			if (fileExtension && ALLOWED_EXTENSIONS.has(fileExtension) && !$('#fileExtensionInput').hasClass('dirty')) {
 				$('#fileExtensionInput').val(fileExtension)
 			}
 		})
@@ -93,6 +95,11 @@ $(function() {
 				return
 			}
 
+			if (!ALLOWED_EXTENSIONS.has($('#fileExtensionInput').val())) {
+				toastr.error("Le fichier n'a pas une extension supportée")
+				return
+			}
+
 			fetch(`/groups/${gId}/files`, {
 				method: "POST",
 				credentials: "include",
@@ -103,7 +110,7 @@ $(function() {
 				if (payload.error) {
 					toastr.error(payload.error)
 				} else {
-					console.log("yes")
+					console.log(payload)
 					//location.replace(payload.redirect)
 				}
 			})

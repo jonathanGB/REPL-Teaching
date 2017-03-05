@@ -38,6 +38,12 @@ func (gc *GroupController) CreateGroup(c *gin.Context) {
 	gName := c.PostForm("groupName")
 	gPwd := c.PostForm("groupPassword")
 
+	if gName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Nom de groupe ne peut pas être vide",
+		})
+	}
+
 	if alreadyGroup := gc.model.IsThereGroup(gName, user.Id); alreadyGroup {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Nom déjà utilisé",

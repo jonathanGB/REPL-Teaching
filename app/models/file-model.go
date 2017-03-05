@@ -25,3 +25,26 @@ type (
 func NewFileModel(s *mgo.Session) *FileModel {
 	return &FileModel{s.DB("repl")}
 }
+
+func (fm *FileModel) IsThereUserFile(fileName string, gId, uId bson.ObjectId) bool {
+	result := struct {
+		Id bson.ObjectId `bson:"_id"`
+	}{}
+
+	fm.db.C("groups").Find(bson.M{
+		"_id":         gId,
+		"files.owner": uId,
+		"files.name":  fileName,
+	}).Select(bson.M{"_id": 1}).One(&result)
+
+	return result.Id != ""
+}
+
+func (fm *FileModel) AddFile(file *File, gId bson.ObjectId) error {
+	return fm.db.C("groups").Update(
+		bson.M{"_id": gId},
+		bson.M{
+			"$push": bson.M{"files": file},
+		},
+	)
+}
