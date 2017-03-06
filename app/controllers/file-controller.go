@@ -106,7 +106,6 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 	file := models.File{
 		fId,
 		fileName,
-		fId,
 		uId,
 		fileExtension,
 		fileContent,
@@ -144,9 +143,9 @@ func (fc *FileController) IsFileVisible(c *gin.Context) {
 	}
 
 	user := c.MustGet("user").(*auth.PublicUser)
-	// teacher can see all files of the group
+	// teacher can see all public files of the group and his own
 	// student can see own files, or public by teacher
-	if user.Role == "teacher" || file.Owner == user.Id || file.Owner == group.Teacher && !file.IsPrivate {
+	if file.Owner == user.Id || (user.Role == "teacher" || file.Owner == group.Teacher) && !file.IsPrivate {
 		c.Set("file", file)
 		c.Next()
 		return
