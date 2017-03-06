@@ -20,6 +20,7 @@ func templateRender() multitemplate.Render {
 	r.AddFromFiles("user-groups", "templates/layout.gohtml", "templates/user-groups.gohtml")
 	r.AddFromFiles("join-group", "templates/layout.gohtml", "templates/join-group.gohtml")
 	r.AddFromFiles("user-files", "templates/layout.gohtml", "templates/user-files.gohtml")
+	r.AddFromFiles("editor", "templates/layout.gohtml", "templates/editor.gohtml")
 
 	return r
 }

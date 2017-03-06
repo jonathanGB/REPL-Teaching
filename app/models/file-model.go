@@ -1,7 +1,7 @@
 package models
 
 import (
-	//"golang.org/x/crypto/bcrypt"
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -47,4 +47,18 @@ func (fm *FileModel) AddFile(file *File, gId bson.ObjectId) error {
 			"$push": bson.M{"files": file},
 		},
 	)
+}
+
+func (fm *FileModel) GetFile(fId, gId bson.ObjectId) (*File, error) {
+	result := struct {
+		Files []File `bson:"files"`
+	}{}
+
+	fm.db.C("groups").Find(bson.M{"_id": gId, "files._id": fId}).Select(bson.M{"files.$": 1, "_id": 0}).One(&result)
+
+	if len(result.Files) != 1 || result.Files[0].Id == "" {
+		return nil, fmt.Errorf("no file found")
+	}
+
+	return &result.Files[0], nil
 }

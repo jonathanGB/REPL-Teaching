@@ -110,8 +110,7 @@ $(function() {
 				if (payload.error) {
 					toastr.error(payload.error)
 				} else {
-					console.log(payload)
-					//location.replace(payload.redirect)
+					location.replace(payload.redirect)
 				}
 			})
 		})

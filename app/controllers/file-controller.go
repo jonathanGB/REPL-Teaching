@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/jonathanGB/REPL-Teaching/app/auth"
 	"github.com/jonathanGB/REPL-Teaching/app/models"
@@ -122,5 +123,65 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 			"redirect": fmt.Sprintf("/groups/%s/files/%s", gId.Hex(), fId.Hex()),
 		})
 	}
+}
 
+func (fc *FileController) IsFileVisible(c *gin.Context) {
+	fIdHex := c.Param("fileId")
+	group := c.MustGet("group").(*models.GroupInfo)
+
+	if !bson.IsObjectIdHex(fIdHex) {
+		c.Abort()
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files", group.Id.Hex()))
+		return
+	}
+	fId := bson.ObjectIdHex(fIdHex)
+
+	file, err := fc.model.GetFile(fId, group.Id)
+	if err != nil {
+		c.Abort()
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files", group.Id.Hex()))
+		return
+	}
+
+	user := c.MustGet("user").(*auth.PublicUser)
+	// teacher can see all files of the group
+	// student can see own files, or public by teacher
+	if user.Role == "teacher" || file.Owner == user.Id || file.Owner == group.Teacher && !file.IsPrivate {
+		c.Set("file", file)
+		c.Next()
+		return
+	}
+
+	c.Abort()
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files", group.Id.Hex()))
+}
+
+func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fileOwner := c.MustGet("file").(*models.File).Owner
+		uId := c.MustGet("user").(*auth.PublicUser).Id
+		gId := c.MustGet("group").(*models.GroupInfo).Id
+
+		if fileOwner == uId && status || fileOwner != uId && !status {
+			c.Next()
+			return
+		}
+
+		c.Abort()
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files", gId.Hex()))
+	}
+}
+
+func (fc *FileController) ShowFile(c *gin.Context) {
+	file := c.MustGet("file").(*models.File)
+
+	c.HTML(http.StatusOK, "editor", gin.H{
+		"title": fmt.Sprintf("edit %s", file.Name),
+		"editor": gin.H{
+			"fileName":      file.Name,
+			"fileExtension": file.Extension,
+			"fileContent":   base64.StdEncoding.EncodeToString(file.Content),
+			"privateFile":   file.IsPrivate,
+		},
+	})
 }

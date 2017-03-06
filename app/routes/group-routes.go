@@ -28,9 +28,20 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 			group.GET("/join", auth.IsProf(false, "html"), gc.IsGroupMember(false), gc.ShowJoiningGroup)
 			group.POST("/join", auth.IsProf(false, "json"), gc.IsGroupMember(false), gc.JoinGroup)
 
-			// TODO: dummy response for now
-			group.GET("/files", gc.IsGroupMember(true), fc.ShowGroupFiles)
-			group.POST("/files", gc.IsGroupMember(true), fc.CreateFile)
+			files := group.Group("/files", gc.IsGroupMember(true))
+			{
+				// TODO: dummy response for now
+				files.GET("/", gc.IsGroupMember(true), fc.ShowGroupFiles)
+				files.POST("/", gc.IsGroupMember(true), fc.CreateFile)
+
+				file := files.Group("/:fileId", fc.IsFileVisible)
+				{
+					file.GET("/", fc.IsFileOwner(true), fc.ShowFile)
+					// file.PUT("/", fc.IsFileOwner(true), fc.UpdateFile)
+
+					// file.POST("/clone", auth.isProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
+				}
+			}
 		}
 	}
 }

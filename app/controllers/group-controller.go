@@ -83,7 +83,7 @@ func (gc *GroupController) CreateGroup(c *gin.Context) {
 
 func (gc *GroupController) IsGroup(c *gin.Context) {
 	gIdHex := c.Param("groupId")
-	fmt.Println(gIdHex)
+
 	if !bson.IsObjectIdHex(gIdHex) {
 		c.Abort()
 		c.Redirect(http.StatusSeeOther, "/groups")
