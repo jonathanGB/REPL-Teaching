@@ -1,0 +1,26 @@
+{{define "body"}}
+<header class="jumbotron">
+		<h1><a href="/"><img src="/public/img/logo.png" alt="logo" width="100" height="100"> REPL en classe</a></h1>
+		<div id="headerDescription">
+				<h3>Un REPL comme outil d'enseignment</h3>
+				<nav class="pull-right">
+						<a href="/users/logout" class="btn btn-lg btn-primary">Se déconnecter <span class="glyphicon glyphicon-log-out"></span></a>
+				</nav>
+		</div>
+</header>
+
+<main class="editor">
+	<nav>
+		<div class="left-nav">
+			<span id="fileName">{{.editor.fileName}}</span>
+		</div>
+		<div class="empty-nav"></div>
+		<div class="right-nav">
+			<button class="btn btn-info disabled" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
+			<!-- Enable button once connection is made -->
+		</div>
+	</nav>
+	<pre id="editor" data-extension="{{.editor.fileExtension}}" data-code="{{.editor.fileContent}}"></pre>
+	<pre id="results"></pre>
+</main>
+{{end}}
