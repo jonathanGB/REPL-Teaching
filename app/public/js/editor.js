@@ -15,4 +15,13 @@ $(function() {
   let results = ace.edit("results");
   results.setReadOnly(true);
   results.setShowPrintMargin(false);
+
+
+	$('#changeStatus').click(function(e) {
+		let currStatus = $(this).data('status')
+		// update db
+		// change style
+		$(this).data('status', !currStatus)
+		$(this).children('.status-text').text(currStatus ? "Public" : "Privé").siblings('.file-status').removeClass(`${currStatus}`).addClass(`${!currStatus}`)
+	})
 })

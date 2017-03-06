@@ -16,8 +16,19 @@
 		</div>
 		<div class="empty-nav"></div>
 		<div class="right-nav">
-			<button class="btn btn-info disabled" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
+			<div id="changeStatus" data-status="{{.editor.privateFile}}" data-toggle="popover" title="Changer de statut" data-content="Cliquez pour changer le statut du fichier" data-placement="top" data-trigger="hover" data-container="body">
+				<span class="status-text">
+					{{if .editor.privateFile}}
+						Privé
+					{{else}}
+						Public
+					{{end}}
+				</span>
+				<span class="file-status {{.editor.privateFile}}"></span>
+			</div>
 			<!-- Enable button once connection is made -->
+			<button class="btn btn-info disabled" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
+
 		</div>
 	</nav>
 	<pre id="editor" data-extension="{{.editor.fileExtension}}" data-code="{{.editor.fileContent}}"></pre>

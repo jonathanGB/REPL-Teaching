@@ -4,6 +4,7 @@ const ALLOWED_EXTENSIONS = new Set(["go", "js"])
 $(function() {
     // at the beginning
     updateFooterOpacity()
+    $('[data-toggle="popover"]').popover(); 
 
 
     // events

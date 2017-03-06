@@ -114,6 +114,29 @@ main.editor .empty-nav {
   font-weight: bold;
   font-size: 17px; }
 
+#changeStatus {
+  line-height: 38px;
+  color: white;
+  font-size: 15px;
+  cursor: pointer; }
+  #changeStatus .file-status {
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 0 10px 0 4px;
+    vertical-align: middle;
+    transition: background-color 1s; }
+    #changeStatus .file-status.true {
+      background: red; }
+    #changeStatus .file-status.false {
+      background: #92ef95; }
+
+#runFile:hover .glyphicon {
+  transform: rotateZ(180deg); }
+#runFile .glyphicon {
+  transition: transform 0.6s; }
+
 /* FOOTER */
 footer {
   position: fixed;
