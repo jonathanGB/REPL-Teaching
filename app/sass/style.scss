@@ -145,6 +145,13 @@ main.editor {
 	.empty-nav {
 		flex: 1 0;
 	}
+
+	.right-nav {
+		button {
+			font-weight: bold;
+			font-size: 17px;
+		}
+	}
 }
 
 #fileName {
@@ -156,9 +163,18 @@ main.editor {
   border-radius: 3px;
 }
 
+#saveFile {
+	margin-right: 5px;
+}
+
 #runFile {
-  font-weight: bold;
-  font-size: 17px;
+	&:hover:not(.disabled) .glyphicon {
+		transform: rotateZ(180deg);
+	}
+
+	.glyphicon {
+		transition: transform 0.6s;
+	}
 }
 
 #changeStatus {
@@ -183,16 +199,6 @@ main.editor {
 		&.false {
 			background: #92ef95;
 		}
-	}
-}
-
-#runFile {
-	&:hover .glyphicon {
-		transform: rotateZ(180deg);
-	}
-
-	.glyphicon {
-		transition: transform 0.6s;
 	}
 }
 

@@ -101,6 +101,9 @@ main.editor nav {
     display: inline-flex; }
 main.editor .empty-nav {
   flex: 1 0; }
+main.editor .right-nav button {
+  font-weight: bold;
+  font-size: 17px; }
 
 #fileName {
   color: #fff;
@@ -110,9 +113,13 @@ main.editor .empty-nav {
   padding: 3px;
   border-radius: 3px; }
 
-#runFile {
-  font-weight: bold;
-  font-size: 17px; }
+#saveFile {
+  margin-right: 5px; }
+
+#runFile:hover:not(.disabled) .glyphicon {
+  transform: rotateZ(180deg); }
+#runFile .glyphicon {
+  transition: transform 0.6s; }
 
 #changeStatus {
   line-height: 38px;
@@ -131,11 +138,6 @@ main.editor .empty-nav {
       background: red; }
     #changeStatus .file-status.false {
       background: #92ef95; }
-
-#runFile:hover .glyphicon {
-  transform: rotateZ(180deg); }
-#runFile .glyphicon {
-  transition: transform 0.6s; }
 
 /* FOOTER */
 footer {
