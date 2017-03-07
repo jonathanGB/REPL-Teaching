@@ -37,6 +37,9 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 				file := files.Group("/:fileId", fc.IsFileVisible)
 				{
 					file.GET("/", fc.IsFileOwner(true), fc.ShowFile)
+					file.GET("/ws", fc.IsFileOwner(true), func(c *gin.Context) {
+						fc.WSHandler(c.Writer, c.Request)
+					})
 					// file.PUT("/", fc.IsFileOwner(true), fc.UpdateFile)
 
 					// file.POST("/clone", auth.isProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)

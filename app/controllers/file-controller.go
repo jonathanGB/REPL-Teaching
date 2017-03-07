@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jonathanGB/REPL-Teaching/app/auth"
 	"github.com/jonathanGB/REPL-Teaching/app/models"
+	"github.com/gorilla/websocket"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,6 +17,11 @@ var (
 	ALLOWED_EXTENSIONS = map[string]bool{
 		"go": true,
 		"js": true,
+	}
+
+	wsupgrader = websocket.Upgrader{
+		ReadBufferSize:  10240,
+		WriteBufferSize: 1024,
 	}
 )
 
@@ -173,6 +179,7 @@ func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
 
 func (fc *FileController) ShowFile(c *gin.Context) {
 	file := c.MustGet("file").(*models.File)
+	uId := c.MustGet("user").(*auth.PublicUser).Id
 
 	c.HTML(http.StatusOK, "editor", gin.H{
 		"title": fmt.Sprintf("edit %s", file.Name),
@@ -181,6 +188,27 @@ func (fc *FileController) ShowFile(c *gin.Context) {
 			"fileExtension": file.Extension,
 			"fileContent":   base64.StdEncoding.EncodeToString(file.Content),
 			"privateFile":   file.IsPrivate,
+			"isFileOwner": file.Owner == uId,
 		},
 	})
+}
+
+func (fc *FileController) WSHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := wsupgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Error connecting websocket %+v", err)
+		return
+	}
+
+	for {
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("closed")
+			conn.Close()
+			break
+		}
+		fmt.Println(t)
+
+		conn.WriteMessage(t, msg)
+	}
 }

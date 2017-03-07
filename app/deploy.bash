@@ -15,7 +15,8 @@ do
 		echo "Installing mgo.v2" && go get gopkg.in/mgo.v2 &&
 		echo "Installing bson"   && go get gopkg.in/mgo.v2/bson &&
 		echo "Installing bcrypt" && go get golang.org/x/crypto/bcrypt &&
-		echo "Installing jwt" && go get github.com/dgrijalva/jwt-go
+		echo "Installing jwt" && go get github.com/dgrijalva/jwt-go &&
+		echo "Installing gorilla-toolkit/websocket" && go get github.com/gorilla/websocket
 	fi
 
 	# to restart the database (creates by default a "foo" collection)
