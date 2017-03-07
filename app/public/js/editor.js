@@ -6,7 +6,7 @@ $(function() {
 		js: 'javascript',
 		go: 'golang'
 	}
-	let wsURL =`wss://${location.host}${location.pathname}ws`
+	let wsURL =`ws://${location.host}${location.pathname}ws`
 
   editor.setTheme("ace/theme/monokai");
   editor.setHighlightActiveLine(true);
