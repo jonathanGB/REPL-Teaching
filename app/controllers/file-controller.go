@@ -43,11 +43,16 @@ func NewFileController(s *mgo.Session) *FileController {
 // TODO: complete getting files from db
 func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 	gInfo := c.MustGet("group").(*models.GroupInfo)
+	user := c.MustGet("user").(*auth.PublicUser)
+
+	files := fc.model.GetGroupFiles(gInfo.Teacher, gInfo.Id, user.Id, user.Role)
 
 	c.HTML(http.StatusOK, "user-files", gin.H{
 		"title": "Files list",
+		"role": user.Role,
 		"group": gin.H{
 			"Id": gInfo.Id.Hex(),
+			"Files": files,
 		},
 	})
 }
@@ -91,9 +96,9 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 	}
 
 	gId := c.MustGet("group").(*models.GroupInfo).Id
-	uId := c.MustGet("user").(*auth.PublicUser).Id
+	user := c.MustGet("user").(*auth.PublicUser)
 
-	if alreadyFile := fc.model.IsThereUserFile(fileName, gId, uId); alreadyFile {
+	if alreadyFile := fc.model.IsThereUserFile(fileName, gId, user.Id); alreadyFile {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Nom de fichier déjà utilisé",
 		})
@@ -112,7 +117,8 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 	file := models.File{
 		fId,
 		fileName,
-		uId,
+		user.Id,
+		user.Name,
 		fileExtension,
 		fileContent,
 		isPrivateFile == "private",
@@ -193,7 +199,7 @@ func (fc *FileController) ShowFile(c *gin.Context) {
 	})
 }
 
-func (fc *FileController) WSHandler(w http.ResponseWriter, r *http.Request) {
+func (fc *FileController) EditorWSHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := wsupgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Error connecting websocket %+v", err)

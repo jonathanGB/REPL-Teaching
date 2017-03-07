@@ -39,7 +39,7 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 					file.GET("/", fc.ShowFile)
 
 					file.GET("/ws", fc.IsFileOwner(true), func(c *gin.Context) {
-						fc.WSHandler(c.Writer, c.Request)
+						fc.EditorWSHandler(c.Writer, c.Request)
 					})
 					// file.PUT("/", fc.IsFileOwner(true), fc.UpdateFile)
 

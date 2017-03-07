@@ -59,21 +59,19 @@
 		<h2 class="header">Fichiers <span class="glyphicon glyphicon-file"></span></h2>
 	</div>
 	<ul id="filesList">
-		<!-- TODO: update templating loop
-		{{range .data}}
+		<!-- TODO: update templating loop -->
+		Prof:
+		{{range .group.Files.TeacherFiles}}
 			<li>
-				<a href="/groups/{{.Id}}/files">
+				<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
 					<div class="group">
 						<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
 						<h3>{{.Name}}</h3>
-						{{if eq $.user.Role "student"}}
-							Prof: {{.TeacherName}} <br>
-						{{end}}
-						Fichiers: {{.FilesLen}}
-					</div>
 				</a>
 			</li>
-		{{end}} -->
+		{{end}}
+		Étudiants:
+
 	</ul>
 </main>
 {{end}}
