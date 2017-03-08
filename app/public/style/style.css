@@ -55,6 +55,21 @@ main {
   main .group h3 {
     margin-top: 10px;
     color: black; }
+  main .user-files {
+    border: 2px solid rgba(51, 122, 183, 0.4);
+    margin: 20px 0;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 20px 1px #757575; }
+    main .user-files.prof-files {
+      margin-bottom: 60px; }
+    main .user-files h3 {
+      margin: 0; }
+    main .user-files .user-info {
+      font-size: 15px;
+      font-style: italic;
+      color: #4c4c4c; }
 
 main.list {
   position: relative; }

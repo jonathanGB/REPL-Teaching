@@ -31,9 +31,9 @@ type (
 		IsPrivate bool
 	}
 
-	StructuredRenderedFiles struct{
+	StructuredRenderedFiles struct {
 		TeacherFiles []RenderedFile
-		StudentKeys []string
+		StudentKeys  []string
 		StudentFiles map[string][]RenderedFile
 	}
 )

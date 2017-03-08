@@ -3,9 +3,9 @@ package controllers
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"github.com/jonathanGB/REPL-Teaching/app/auth"
 	"github.com/jonathanGB/REPL-Teaching/app/models"
-	"github.com/gorilla/websocket"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -49,10 +49,11 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "user-files", gin.H{
 		"title": "Files list",
-		"role": user.Role,
+		"role":  user.Role,
 		"group": gin.H{
-			"Id": gInfo.Id.Hex(),
-			"Files": files,
+			"Id":      gInfo.Id.Hex(),
+			"Teacher": gInfo.TeacherName,
+			"Files":   files,
 		},
 	})
 }
@@ -194,7 +195,7 @@ func (fc *FileController) ShowFile(c *gin.Context) {
 			"fileExtension": file.Extension,
 			"fileContent":   base64.StdEncoding.EncodeToString(file.Content),
 			"privateFile":   file.IsPrivate,
-			"isFileOwner": file.Owner == uId,
+			"isFileOwner":   file.Owner == uId,
 		},
 	})
 }

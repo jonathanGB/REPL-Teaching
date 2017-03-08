@@ -58,20 +58,57 @@
 	<div class="text-center">
 		<h2 class="header">Fichiers <span class="glyphicon glyphicon-file"></span></h2>
 	</div>
-	<ul id="filesList">
-		<!-- TODO: update templating loop -->
-		Prof:
-		{{range .group.Files.TeacherFiles}}
-			<li>
-				<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
-					<div class="group">
-						<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
-						<h3>{{.Name}}</h3>
-				</a>
-			</li>
-		{{end}}
-		Étudiants:
-
-	</ul>
+	<h3>Prof: </h3>
+	<div class="user-files prof-files">
+		<h3>{{.group.Teacher}}</h3>
+		<span class="user-info">
+			{{$lenTeacherFiles := len .group.Files.TeacherFiles}}
+			{{$lenTeacherFiles}}
+			{{if le $lenTeacherFiles 1}}
+				fichier
+			{{else}}
+				fichiers
+			{{end}}
+		</span>
+		<ul class="filesList">
+			{{range .group.Files.TeacherFiles}}
+				<li>
+					<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
+						<div class="group file">
+							<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
+							<h4>{{.Name}}</h4>
+						</div>
+					</a>
+				</li>
+			{{end}}
+		</ul>
+	</div>
+	<h3>Étudiants:</h3>
+	{{range .group.Files.StudentKeys}}
+		<div class="user-files">
+			<h3>{{(index $.group.Files.StudentFiles . 0).OwnerName}}</h3>
+			<span class="user-info">
+				{{$lenUserFiles := len (index $.group.Files.StudentFiles .)}}
+				{{$lenUserFiles}}
+				{{if le $lenUserFiles 1}}
+					fichier
+				{{else}}
+					fichiers
+				{{end}}
+			</span>
+			<ul class="filesList">
+				{{range (index $.group.Files.StudentFiles .)}}
+					<li>
+						<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
+							<div class="group file">
+								<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
+								<h4>{{.Name}}</h4>
+							</div>
+						</a>
+					</li>
+				{{end}}
+			</ul>
+		</div>
+	{{end}}
 </main>
 {{end}}
