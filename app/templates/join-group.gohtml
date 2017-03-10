@@ -11,7 +11,10 @@
 
 <main>
 	<div class="text-center">
-		<h2 class="header">Joindre {{.group.Name}} <span class="glyphicon glyphicon-transfer"></span></h2>
+		<h2 class="header">
+			Joindre {{.group.Name}} <span class="glyphicon glyphicon-flash"></span> <br>
+			<span class="group-info">Prof: {{.group.Teacher}}</span>
+		</h2>
 		<!-- TODO: ajouter plus d'info -->
 	</div>
 	<form id="joinGroup" class="" action="" method="POST" data-groupid="{{.group.Id}}"> <!-- sent via AJAX -->

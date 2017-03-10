@@ -42,6 +42,30 @@
 		  </div><!-- /.modal-dialog -->
 		</div><!-- /.modal -->
 		<button class="btn btn-lg btn-success add" data-toggle="modal" data-target="#createGroupModal">Nouveau groupe <span class="glyphicon glyphicon-plus"></span></button>
+		{{else}}
+			<div class="modal fade" tabindex="-1" role="dialog" id="searchGroupModal">
+			  <div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title">Joindre un groupe</h4>
+			      </div>
+						<form id="searchGroup" class="" action="" method="POST"> <!-- sent via AJAX -->
+				      <div class="modal-body">
+								<div class="form-group">
+							    <label for="groupName">ID du groupe</label>
+							    <input type="text" class="form-control" id="groupId" name="groupId" placeholder="Id du groupe" required>
+							  </div>
+				      </div>
+				      <div class="modal-footer">
+				        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+				        <button type="submit" class="btn btn-primary">Joindre</button>
+				      </div>
+						</form>
+			    </div><!-- /.modal-content -->
+			  </div><!-- /.modal-dialog -->
+			</div><!-- /.modal -->
+			<button class="btn btn-lg btn-success add" data-toggle="modal" data-target="#searchGroupModal">Nouveau groupe <span class="glyphicon glyphicon-link"></span></button>
 	{{end}}
 	<div class="text-center">
 		<h2 class="header">Groupes <span class="glyphicon glyphicon-home"></span></h2>

@@ -6,6 +6,7 @@ import (
 	"github.com/jonathanGB/REPL-Teaching/app/routes"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
+	"net/http"
 )
 
 var s = initDB()
@@ -21,6 +22,7 @@ func templateRender() multitemplate.Render {
 	r.AddFromFiles("join-group", "templates/layout.gohtml", "templates/join-group.gohtml")
 	r.AddFromFiles("user-files", "templates/layout.gohtml", "templates/user-files.gohtml")
 	r.AddFromFiles("editor", "templates/layout.gohtml", "templates/editor.gohtml")
+	r.AddFromFiles("not-found", "templates/layout.gohtml", "templates/not-found.gohtml")
 
 	return r
 }
@@ -35,6 +37,11 @@ func getMainEngine() *gin.Engine {
 	routes.FooBarRoutes(app, s)
 	routes.UserRoutes(app, s)
 	routes.GroupRoutes(app, s)
+	app.NoRoute(func (c *gin.Context) {
+		c.HTML(http.StatusNotFound, "not-found", gin.H{
+			"title": "404 - not found",
+		})
+	})
 
 	fmt.Println("\n") // empty buffer in output
 	return app

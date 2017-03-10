@@ -30,6 +30,10 @@ main {
   main .header {
     display: inline-block;
     margin-bottom: 40px; }
+    main .header .group-info {
+      font-size: 15px;
+      font-style: italic;
+      color: #4c4c4c; }
   main .header, main .group {
     padding: 10px 30px;
     border-radius: 10px;

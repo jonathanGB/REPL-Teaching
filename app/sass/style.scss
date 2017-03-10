@@ -44,6 +44,12 @@ main {
 		.header {
 		    display: inline-block;
 				margin-bottom: 40px;
+
+				.group-info {
+					font-size: 15px;
+					font-style: italic;
+					color: #4c4c4c;
+				}
 		}
 
 		.header, .group {
@@ -159,7 +165,7 @@ button.add {
 main.editor {
 	& > div {
 		margin-bottom: 50px;
-		
+
 		button {
 			font-weight: bold;
 			font-size: 17px;

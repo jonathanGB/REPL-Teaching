@@ -4,7 +4,7 @@ const ALLOWED_EXTENSIONS = new Set(["go", "js"])
 $(function() {
     // at the beginning
     updateFooterOpacity()
-    $('[data-toggle="popover"]').popover(); 
+    $('[data-toggle="popover"]').popover();
 
 
     // events
@@ -65,6 +65,13 @@ $(function() {
 					location.replace(payload.redirect)
 				}
 			})
+		})
+
+		$('#searchGroup').submit(function(e) {
+			e.preventDefault()
+			let gId = $('#groupId').val()
+
+			location.assign(`/groups/${gId}/join`)
 		})
 
 		$('input, select').change(function(e) {

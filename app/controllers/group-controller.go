@@ -140,6 +140,7 @@ func (gc *GroupController) ShowJoiningGroup(c *gin.Context) {
 		"group": gin.H{
 			"Id":   gInfo.Id.Hex(),
 			"Name": gInfo.Name,
+			"Teacher": gInfo.TeacherName,
 		},
 	})
 }
