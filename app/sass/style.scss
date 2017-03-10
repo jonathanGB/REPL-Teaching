@@ -5,6 +5,8 @@ body {
 }
 
 
+
+
 /* HEADER */
 #headerDescription {
     margin-top: 20px;
@@ -155,6 +157,19 @@ button.add {
 }
 
 main.editor {
+	& > div {
+		margin-bottom: 50px;
+		
+		button {
+			font-weight: bold;
+			font-size: 17px;
+
+			a {
+				color: white;
+			}
+		}
+	}
+
 	nav {
 	  margin-bottom: 15px;
 	  display: flex;

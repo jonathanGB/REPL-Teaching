@@ -108,6 +108,13 @@ button.add {
   height: 500px;
   margin: 0; }
 
+main.editor > div {
+  margin-bottom: 50px; }
+  main.editor > div button {
+    font-weight: bold;
+    font-size: 17px; }
+    main.editor > div button a {
+      color: white; }
 main.editor nav {
   margin-bottom: 15px;
   display: flex;

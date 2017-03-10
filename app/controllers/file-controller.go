@@ -191,9 +191,11 @@ func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
 func (fc *FileController) ShowFile(c *gin.Context) {
 	file := c.MustGet("file").(*models.File)
 	uId := c.MustGet("user").(*auth.PublicUser).Id
+	gId := c.MustGet("group").(*models.GroupInfo).Id
 
 	c.HTML(http.StatusOK, "editor", gin.H{
 		"title": fmt.Sprintf("edit %s", file.Name),
+		"groupId": gId.Hex(),
 		"editor": gin.H{
 			"fileName":      file.Name,
 			"fileExtension": file.Extension,
