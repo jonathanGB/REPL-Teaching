@@ -128,6 +128,25 @@ $(function() {
 				}
 			})
 		})
+
+		$('body').on('submit', '.cloneForm', function(e) {
+			e.preventDefault()
+
+			let fId = $(this).data('clone')
+			fetch(`${location.pathname}${fId}/clone`, {
+				method: "POST",
+				credentials: "include",
+				body: new FormData(this)
+			})
+			.then(response => response.json())
+			.then(payload => {
+				if (payload.error) {
+					toastr.error(payload.error)
+				} else {
+					location.replace(payload.redirect)
+				}
+			})
+		})
 })
 
 

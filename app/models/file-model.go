@@ -24,6 +24,7 @@ type (
 		Size         string        `bson:"size"`
 		IsPrivate    bool          `bson:"isPrivate"`
 		LastModified time.Time     `bson:"lastModified"`
+		ClonedBy     map[string]bool `bson:"clonedBy"`
 	}
 
 	RenderedFile struct {
@@ -36,6 +37,7 @@ type (
 		Size         string
 		IsPrivate    bool
 		LastModified string
+		ClonedBy     map[string]bool // ObjectIdHex -> bool
 	}
 
 	StructuredRenderedFiles struct {
@@ -76,6 +78,7 @@ func (fm *FileModel) GetGroupFiles(tId, gId, uId bson.ObjectId, role string) *St
 				file.Size,
 				file.IsPrivate,
 				file.LastModified.Format("02 Jan 15:04"),
+				file.ClonedBy,
 			}
 
 			if file.Owner == tId { // teacher's file
@@ -108,10 +111,16 @@ func (fm *FileModel) IsThereUserFile(fileName string, gId, uId bson.ObjectId) bo
 		Id bson.ObjectId `bson:"_id"`
 	}{}
 
+	fmt.Println(fileName, gId, uId)
+
 	fm.db.C("groups").Find(bson.M{
 		"_id":         gId,
-		"files.owner": uId,
-		"files.name":  fileName,
+		"files": bson.M{
+			"$elemMatch": bson.M{
+				"owner": uId,
+				"name":  fileName,
+			},
+		},
 	}).Select(bson.M{"_id": 1}).One(&result)
 
 	return result.Id != ""
@@ -138,4 +147,13 @@ func (fm *FileModel) GetFile(fId, gId bson.ObjectId) (*File, error) {
 	}
 
 	return &result.Files[0], nil
+}
+
+func (fm *FileModel) AddCloner(uId, gId, fId bson.ObjectId) error {
+	return fm.db.C("groups").Update(
+		bson.M{"_id": gId, "files._id": fId},
+		bson.M{
+			"$set": bson.M{("files.$.clonedBy." + uId.Hex()): true},
+		},
+	)
 }

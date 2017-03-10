@@ -51,6 +51,7 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 	c.HTML(http.StatusOK, "user-files", gin.H{
 		"title": "Files list",
 		"role":  user.Role,
+		"userId": user.Id.Hex(),
 		"group": gin.H{
 			"Id":      gInfo.Id.Hex(),
 			"Teacher": gInfo.TeacherName,
@@ -127,6 +128,7 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 		readableByteSize(fileSize),
 		isPrivateFile == "private",
 		time.Now(),
+		map[string]bool{},
 	}
 
 	if err := fc.model.AddFile(&file, gId); err != nil {
@@ -204,6 +206,55 @@ func (fc *FileController) ShowFile(c *gin.Context) {
 			"isFileOwner":   file.Owner == uId,
 		},
 	})
+}
+
+func (fc *FileController) CloneFile(c *gin.Context) {
+	file := c.MustGet("file").(*models.File)
+	fileName := c.PostForm("cloneFileName")
+	user := c.MustGet("user").(*auth.PublicUser)
+	gId := c.MustGet("group").(*models.GroupInfo).Id
+
+	if found, _ := file.ClonedBy[user.Id.Hex()]; found {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "déjà cloné",
+		})
+		return
+	}
+
+	if alreadyFile := fc.model.IsThereUserFile(fileName, gId, user.Id); alreadyFile {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Nom de fichier déjà utilisé",
+		})
+		return
+	}
+
+	fc.model.AddCloner(user.Id, gId, file.Id)
+
+	fId := bson.NewObjectId()
+	clonedFile := models.File{
+		fId,
+		fileName,
+		user.Id,
+		user.Name,
+		user.Email,
+		file.Extension,
+		file.Content,
+		file.Size,
+		file.IsPrivate,
+		time.Now(),
+		map[string]bool{},
+	}
+
+	if err := fc.model.AddFile(&clonedFile, gId); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erreur lors de la création du fichier",
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"error":    nil,
+			"redirect": fmt.Sprintf("/groups/%s/files/%s", gId.Hex(), fId.Hex()),
+		})
+	}
 }
 
 func (fc *FileController) EditorWSHandler(w http.ResponseWriter, r *http.Request) {

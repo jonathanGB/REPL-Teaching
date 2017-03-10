@@ -43,7 +43,7 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 					})
 					// file.PUT("/", fc.IsFileOwner(true), fc.UpdateFile)
 
-					// file.POST("/clone", auth.isProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
+					file.POST("/clone", auth.IsProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
 				}
 			}
 		}

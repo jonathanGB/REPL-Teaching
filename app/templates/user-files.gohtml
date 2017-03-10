@@ -74,7 +74,7 @@
 			{{range .group.Files.TeacherFiles}}
 				<li>
 					<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
-						<div class="group file">
+						<div class="group file 	{{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}no-bottom-border-radius{{end}}">
 							<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
 							<h4>
 								{{.Name}}
@@ -86,6 +86,20 @@
 							dernière modif: {{.LastModified}} <br>
 						</div>
 					</a>
+					{{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}
+						{{$cloneForm := printf `
+						<form class="cloneForm" data-clone="%s">
+							<div class="form-group">
+						    <label>Nom du fichier</label>
+						    <input type="text" class="form-control" name="cloneFileName" value="%s" "placeholder="Nom de fichier" required>
+					  	</div>
+			        <button style="width: 100&#37;;" type="submit" class="btn btn-primary">Clôner</button>
+						</form>` .Id .Name}}
+						<div class="clone-file">
+							<div data-toggle="popover" title="Clôner un fichier" data-html="true" data-content="{{$cloneForm}}" data-placement="right" data-trigger="click" data-container="body">
+							<button class="btn btn-lg btn-primary">Clôner <span class="glyphicon glyphicon-share-alt"></span></button>
+						</div>
+					{{end}}
 				</li>
 			{{end}}
 		</ul>

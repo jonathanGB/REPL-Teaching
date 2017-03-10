@@ -39,12 +39,14 @@ main {
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.85); }
   main .group {
-    margin: 0 auto 20px auto;
+    margin: 20px auto 0 auto;
     position: relative;
     padding-left: 80px;
     text-align: center;
     width: 350px;
     min-height: 86px; }
+    main .group.no-bottom-border-radius {
+      border-radius: 10px 10px 0 0; }
   main .group:hover .group-chevron {
     transform: translateY(-50%); }
   main .group-chevron {
@@ -74,6 +76,12 @@ main {
       font-size: 15px;
       font-style: italic;
       color: #4c4c4c; }
+    main .user-files .clone-file {
+      width: 350px;
+      margin: 0 auto 20px auto; }
+      main .user-files .clone-file button {
+        border-radius: 0 0 6px 6px;
+        width: 100%; }
 
 main.list {
   position: relative; }
