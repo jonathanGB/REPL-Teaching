@@ -102,7 +102,7 @@ func (uc *UserController) LoginUser(c *gin.Context) {
 		})
 		return
 	}
-	token, err := auth.MarshalToken(user.Name, user.Id.Hex(), user.Role)
+	token, err := auth.MarshalToken(user.Name, email, user.Id.Hex(), user.Role)
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "login", gin.H{
 			"title": "login",

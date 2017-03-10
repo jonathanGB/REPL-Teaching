@@ -11,6 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"io"
 	"net/http"
+	"time"
 )
 
 var (
@@ -120,9 +121,12 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 		fileName,
 		user.Id,
 		user.Name,
+		user.Email,
 		fileExtension,
 		fileContent,
+		readableByteSize(fileSize),
 		isPrivateFile == "private",
+		time.Now(),
 	}
 
 	if err := fc.model.AddFile(&file, gId); err != nil {
@@ -218,4 +222,13 @@ func (fc *FileController) EditorWSHandler(w http.ResponseWriter, r *http.Request
 
 		conn.WriteMessage(t, msg)
 	}
+}
+
+func readableByteSize(size int64) string {
+	if size < 1000 {
+		return fmt.Sprintf("%dB", size)
+	}
+
+	kiloSize := float32(size) / 1000
+	return fmt.Sprintf("%.1fkB", kiloSize)
 }

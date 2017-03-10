@@ -76,39 +76,60 @@
 					<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
 						<div class="group file">
 							<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
-							<h4>{{.Name}}</h4>
+							<h4>
+								{{.Name}}
+								{{if eq $.role "teacher"}}
+									({{if .IsPrivate}}privé{{else}}public{{end}})
+								{{end}}
+							</h4>
+							taille: {{.Size}} <br>
+							dernière modif: {{.LastModified}} <br>
 						</div>
 					</a>
 				</li>
 			{{end}}
 		</ul>
 	</div>
-	<h3>Étudiants:</h3>
-	{{range .group.Files.StudentKeys}}
-		<div class="user-files">
-			<h3>{{(index $.group.Files.StudentFiles . 0).OwnerName}}</h3>
-			<span class="user-info">
-				{{$lenUserFiles := len (index $.group.Files.StudentFiles .)}}
-				{{$lenUserFiles}}
-				{{if le $lenUserFiles 1}}
-					fichier
-				{{else}}
-					fichiers
-				{{end}}
-			</span>
-			<ul class="filesList">
-				{{range (index $.group.Files.StudentFiles .)}}
-					<li>
-						<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
-							<div class="group file">
-								<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
-								<h4>{{.Name}}</h4>
-							</div>
-						</a>
-					</li>
-				{{end}}
-			</ul>
-		</div>
+	{{if .group.Files.StudentKeys}}
+		{{if eq $.role "teacher"}}
+			<h3>Étudiants:</h3>
+		{{else}}
+			<h3>Ses fichiers:</h3>
+		{{end}}
+		{{range .group.Files.StudentKeys}}
+			<div class="user-files">
+				<h3>{{(index $.group.Files.StudentFiles . 0).OwnerName}}</h3>
+				<span class="user-info">
+					{{(index $.group.Files.StudentFiles . 0).OwnerEmail}} <br>
+					{{$lenUserFiles := len (index $.group.Files.StudentFiles .)}}
+					{{$lenUserFiles}}
+					{{if le $lenUserFiles 1}}
+						fichier
+					{{else}}
+						fichiers
+					{{end}}
+				</span>
+				<ul class="filesList">
+					{{range (index $.group.Files.StudentFiles .)}}
+						<li>
+							<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
+								<div class="group file">
+									<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
+									<h4>
+										{{.Name}}
+										{{if eq $.role "student"}}
+											({{if .IsPrivate}}privé{{else}}public{{end}})
+										{{end}}
+									</h4>
+									taille: {{.Size}} <br>
+									dernière modif: {{.LastModified}}
+								</div>
+							</a>
+						</li>
+					{{end}}
+				</ul>
+			</div>
+		{{end}}
 	{{end}}
 </main>
 {{end}}

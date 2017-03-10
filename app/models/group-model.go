@@ -32,7 +32,6 @@ type (
 		Id          string
 		Name        string
 		TeacherName string
-		FilesLen    int
 	}
 )
 
@@ -49,7 +48,7 @@ func (gm *GroupModel) GetUserGroups(userId bson.ObjectId) []RenderedGroup {
 	gm.db.C("users").Find(bson.M{"_id": userId}).Select(bson.M{"groups": 1, "_id": 0}).One(&userGroups)
 	gm.db.C("groups").Find(bson.M{
 		"_id": bson.M{"$in": userGroups.GroupIDs},
-	}).All(&groups)
+	}).Select(bson.M{"files": 0}).All(&groups)
 
 	rGroups := []RenderedGroup{}
 	for _, group := range groups {
@@ -57,7 +56,6 @@ func (gm *GroupModel) GetUserGroups(userId bson.ObjectId) []RenderedGroup {
 			group.Id.Hex(),
 			group.Name,
 			group.TeacherName,
-			len(group.Files),
 		})
 	}
 

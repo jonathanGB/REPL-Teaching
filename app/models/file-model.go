@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"sort"
+	"time"
 )
 
 type (
@@ -13,22 +14,28 @@ type (
 	}
 
 	File struct {
-		Id        bson.ObjectId `bson:"_id"`
-		Name      string        `bson:"name"`
-		Owner     bson.ObjectId `bson:"owner"`
-		OwnerName string        `bson:"ownerName"`
-		Extension string        `bson:"extension"`
-		Content   []byte        `bson:"content"`
-		IsPrivate bool          `bson:"isPrivate"`
+		Id           bson.ObjectId `bson:"_id"`
+		Name         string        `bson:"name"`
+		Owner        bson.ObjectId `bson:"owner"`
+		OwnerName    string        `bson:"ownerName"`
+		OwnerEmail   string        `bson:"ownerEmail"`
+		Extension    string        `bson:"extension"`
+		Content      []byte        `bson:"content"`
+		Size         string        `bson:"size"`
+		IsPrivate    bool          `bson:"isPrivate"`
+		LastModified time.Time     `bson:"lastModified"`
 	}
 
 	RenderedFile struct {
-		Id        string // ObjectIdHex
-		Name      string
-		Owner     string // ObjectIdHex
-		OwnerName string
-		Extension string
-		IsPrivate bool
+		Id           string // ObjectIdHex
+		Name         string
+		Owner        string // ObjectIdHex
+		OwnerName    string
+		OwnerEmail   string
+		Extension    string
+		Size         string
+		IsPrivate    bool
+		LastModified string
 	}
 
 	StructuredRenderedFiles struct {
@@ -64,8 +71,11 @@ func (fm *FileModel) GetGroupFiles(tId, gId, uId bson.ObjectId, role string) *St
 				file.Name,
 				file.Owner.Hex(),
 				file.OwnerName,
+				file.OwnerEmail,
 				file.Extension,
+				file.Size,
 				file.IsPrivate,
+				file.LastModified.Format("02 Jan 15:04"),
 			}
 
 			if file.Owner == tId { // teacher's file
@@ -73,8 +83,9 @@ func (fm *FileModel) GetGroupFiles(tId, gId, uId bson.ObjectId, role string) *St
 			} else { // student file
 				// new student name, initialize some structures
 				if _, ok := sResult.StudentFiles[rFile.Owner]; !ok {
-					studentsName = append(studentsName, rFile.OwnerName)
-					studentsNameToKey[rFile.OwnerName] = rFile.Owner
+					studentSlug := fmt.Sprintf("%s%s", rFile.OwnerName, rFile.OwnerEmail)
+					studentsName = append(studentsName, studentSlug)
+					studentsNameToKey[studentSlug] = rFile.Owner
 					sResult.StudentFiles[rFile.Owner] = []RenderedFile{}
 				}
 

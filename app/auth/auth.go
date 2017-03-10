@@ -13,15 +13,17 @@ import (
 var JWT_SECRET []byte = []byte(os.Getenv("JWT_SECRET"))
 
 type PublicUser struct {
+	Email string
 	Id   bson.ObjectId
 	Name string
 	Role string
 }
 
-func MarshalToken(name, id, role string) (string, error) {
+func MarshalToken(name, email, id, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":   id,
 		"name": name,
+		"email": email,
 		"role": role,
 		"exp":  time.Now().Add(time.Hour).Unix(),
 	})
@@ -44,6 +46,7 @@ func unMarshalToken(tokenStr string) (*PublicUser, error) {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return &PublicUser{
+			claims["email"].(string),
 			bson.ObjectIdHex(claims["id"].(string)),
 			claims["name"].(string),
 			claims["role"].(string),
