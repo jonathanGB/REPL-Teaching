@@ -76,7 +76,11 @@ func (gc *GroupController) CreateGroup(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error": nil,
-			"data":  gId,
+			"data":  gin.H{
+				"id": gId,
+				"groupName": gName,
+				"teacherName": user.Name,
+			},
 		})
 	}
 }

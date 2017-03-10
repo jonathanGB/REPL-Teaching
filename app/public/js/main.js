@@ -39,7 +39,13 @@ $(function() {
 					// TODO: show more info in LIs?
 					$('#groupsList').append(
 						`<li>
-							<a href="/groups/${payload.data}/files"><h3>${$('#groupName').val().trim()}</h3></a>
+							<a href="/groups/${payload.data.id}/files/">
+								<div class="group">
+									<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
+									<h3>${payload.data.groupName}</h3>
+									Prof: ${payload.data.teacherName} <br>
+								</div>
+							</a>
 						</li>`
 					)
 
