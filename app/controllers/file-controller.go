@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/jonathanGB/REPL-Teaching/app/auth"
@@ -180,7 +181,7 @@ func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
 		uId := c.MustGet("user").(*auth.PublicUser).Id
 		gId := c.MustGet("group").(*models.GroupInfo).Id
 
-		if fileOwner == uId && status || fileOwner != uId && !status {
+		if (fileOwner == uId) == status { // X-NOR
 			c.Next()
 			return
 		}
@@ -257,12 +258,27 @@ func (fc *FileController) CloneFile(c *gin.Context) {
 	}
 }
 
-func (fc *FileController) EditorWSHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := wsupgrader.Upgrade(w, r, nil)
+func (fc *FileController) EditorWSHandler(c *gin.Context) {
+	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		fmt.Println("Error connecting websocket %+v", err)
 		return
 	}
+
+	fmt.Println("connected")
+	user := c.MustGet("user").(*auth.PublicUser)
+	file := c.MustGet("file").(*models.File)
+	gId := c.MustGet("group").(*models.GroupInfo).Id
+	wsPayload := struct {
+		Type string `json:"type"`
+		Content string `json:"content"`
+		NewStatus bool `json:"newStatus"`
+	}{}
+	wsResponse := struct {
+		Type string `json:"type"`
+		Err bool `json:"err"`
+	}{}
+	// TODO: Register user to hub
 
 	for {
 		t, msg, err := conn.ReadMessage()
@@ -271,9 +287,42 @@ func (fc *FileController) EditorWSHandler(w http.ResponseWriter, r *http.Request
 			conn.Close()
 			break
 		}
-		fmt.Println(t)
 
-		conn.WriteMessage(t, msg)
+		if err := json.Unmarshal(msg, &wsPayload); err != nil {
+			conn.WriteMessage(t, []byte("\"bad payload\""))
+			continue
+		}
+
+		if user.Id != file.Owner && wsPayload.Type != "run" {
+			conn.WriteMessage(t, []byte("\"non-owner cannot modify file\""))
+			conn.Close()
+			break
+		}
+
+		switch wsPayload.Type {
+		case "run":
+			fmt.Println("run") // TODO: link with run service
+		case "update-content":
+			newContent := []byte(wsPayload.Content)
+			newContentSize := len(newContent)
+
+			if newContentSize > MAX_FILE_SIZE {
+				err = fmt.Errorf("file too big")
+			} else {
+				err = fc.model.UpdateFile("content", gId, file.Id, newContent, readableByteSize(int64(newContentSize)))
+			}
+		case "update-status":
+			err = fc.model.UpdateFile("isPrivate", gId, file.Id, wsPayload.NewStatus)
+		}
+
+		wsResponse.Type = wsPayload.Type
+		wsResponse.Err = (err != nil)
+
+		if err != nil {
+			fmt.Println("err in ws", err)
+		}
+		marshalledResponse, _ := json.Marshal(&wsResponse)
+		conn.WriteMessage(t, marshalledResponse)
 	}
 }
 

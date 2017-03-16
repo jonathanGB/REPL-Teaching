@@ -157,3 +157,22 @@ func (fm *FileModel) AddCloner(uId, gId, fId bson.ObjectId) error {
 		},
 	)
 }
+
+func (fm *FileModel) UpdateFile(field string, gId, fId bson.ObjectId, payload ...interface{}) error {
+	specifier := bson.M{
+		"files.$.lastModified": time.Now(),
+	}
+	if field == "isPrivate" {
+		specifier["files.$.isPrivate"] = payload[0]
+	} else {
+		specifier["files.$.content"] = payload[0]
+		specifier["files.$.size"] = payload[1]
+	}
+
+	return fm.db.C("groups").Update(
+		bson.M{"_id": gId, "files._id": fId},
+		bson.M{
+			"$set": specifier,
+		},
+	)
+}

@@ -23,42 +23,45 @@ $(function() {
   results.setReadOnly(true);
   results.setShowPrintMargin(false);
 
+	const socket = new WebSocket(wsURL)
+	socket.onopen = () => {
+		console.log('connected')
 
-	$('#changeStatus').click(function(e) {
-		let currStatus = $(this).data('status')
-		// TODO: update db
-		// change style
-		$(this).data('status', !currStatus)
-		$(this).children('.status-text').text(currStatus ? "Public" : "Privé").siblings('.file-status').removeClass(`${currStatus}`).addClass(`${!currStatus}`)
-	})
-
-	if (isOwner) {
-		const socket = new WebSocket(wsURL)
-		socket.onopen = () => {
-			console.log('connected')
-
-			$('#saveFile').click(function(e) {
-				let data = editor.getValue()
-				if (data.length > MAX_FILE_SIZE) {
-					toastr.error("Le fichier dépasse la limite de 10kB")
-					return
-				}
-
-				let toSend = {
-					type: "update-file",
-					data
-				}
-				socket.send(JSON.stringify(toSend))
-			})
-
-			socket.onmessage = (e) => {
-				console.log('message', e)
-				editor.setValue(JSON.parse(e.data).data.substring(0, 500))
+		$('#saveFile').click(function(e) {
+			let content = editor.getValue()
+			if (content.length > MAX_FILE_SIZE) {
+				toastr.error("Le fichier dépasse la limite de 10kB")
+				return
 			}
 
-			socket.onclose = (e) => {
-				console.log('close', e)
+			let toSend = {
+				type: "update-content",
+				content
 			}
+			socket.send(JSON.stringify(toSend))
+		})
+
+		$('#changeStatus').click(function(e) {
+			let status = $(this).data('status')
+
+			let toSend = {
+				type: "update-status",
+				newStatus: !status
+			}
+			socket.send(JSON.stringify(toSend))
+
+			// TODO: put change inside a callback
+			$(this).data('status', !status)
+			$(this).children('.status-text').text(status ? "Public" : "Privé").siblings('.file-status').removeClass(`${status}`).addClass(`${!status}`)
+		})
+
+		socket.onmessage = (e) => {
+			let payload = JSON.parse(e.data)
+			console.log(payload)
+		}
+
+		socket.onclose = (e) => {
+			console.log('close', e)
 		}
 	}
 
