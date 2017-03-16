@@ -75,6 +75,7 @@
 				<li>
 					<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
 						<div class="group file 	{{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}no-bottom-border-radius{{end}}">
+							<button class="peek btn btn-info {{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}no-bottom-right-border-radius{{end}}"><span class="glyphicon glyphicon-search"></span></button>
 							<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
 							<h4>
 								{{.Name}}
@@ -128,6 +129,7 @@
 						<li>
 							<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
 								<div class="group file">
+									<button class="peek btn btn-info"><span class="glyphicon glyphicon-search"></span></button>
 									<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
 									<h4>
 										{{.Name}}
@@ -146,4 +148,6 @@
 		{{end}}
 	{{end}}
 </main>
+<div class="cover"></div>
+<iframe style="border: none;"></iframe>
 {{end}}

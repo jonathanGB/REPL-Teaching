@@ -23,6 +23,7 @@ func templateRender() multitemplate.Render {
 	r.AddFromFiles("user-files", "templates/layout.gohtml", "templates/user-files.gohtml")
 	r.AddFromFiles("editor", "templates/layout.gohtml", "templates/editor.gohtml")
 	r.AddFromFiles("not-found", "templates/layout.gohtml", "templates/not-found.gohtml")
+	r.AddFromFiles("minimal-editor", "templates/minimal-editor.gohtml")
 
 	return r
 }

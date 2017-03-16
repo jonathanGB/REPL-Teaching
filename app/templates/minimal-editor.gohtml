@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html class="peek">
+  <head>
+      <meta charset="utf-8">
+      <title>REPL - {{.title}}</title>
+      <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+      <link rel="stylesheet" href="/public/style/style.css">
+      <link rel="icon" type="image/ico" href="/favicon.ico">
+  </head>
+	<body class="peek">
+		<main class="editor peek">
+			<nav>
+				<div class="left-nav">
+					<span id="fileName">{{.editor.fileName}}</span>
+				</div>
+				<div class="empty-nav"></div>
+				<div class="right-nav">
+					{{if .editor.isFileOwner}}
+						<div id="changeStatus" data-status="{{.editor.privateFile}}" data-toggle="popover" title="Changer de statut" data-content="Cliquez pour changer le statut du fichier" data-placement="top" data-trigger="hover" data-container="body">
+							<span class="status-text">
+								{{if .editor.privateFile}}
+									Privé
+								{{else}}
+									Public
+								{{end}}
+							</span>
+							<span class="file-status {{.editor.privateFile}}"></span>
+						</div>
+						<button class="btn btn-success" id="saveFile">Sauver <span class="glyphicon glyphicon-save"></span></button>
+					{{end}}
+					<!-- Enable button once connection is made -->
+					<button class="btn btn-info disabled" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
+
+				</div>
+			</nav>
+			<pre id="editor" data-isowner="{{.editor.isFileOwner}}" data-extension="{{.editor.fileExtension}}" data-code="{{.editor.fileContent}}"></pre>
+			<pre id="results"></pre>
+		</main>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="/public/editor/ace.js"></script>
+		<script src="/public/js/editor.js"></script>
+	</body>
+</html>

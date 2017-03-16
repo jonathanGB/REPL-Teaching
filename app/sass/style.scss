@@ -1,7 +1,36 @@
 /* BODY */
+html.peek, body.peek {
+	border-radius: 20px;
+	background-color: transparent;
+}
+
 body {
     background-color: aliceblue;
     font-family: 'Roboto', 'Verdana', 'sans-serif';
+
+		.cover, iframe {
+			display: none;
+		}
+
+		.cover {
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 10;
+			background: rgba(255, 255, 255, 0.8);
+		}
+
+		iframe {
+			width: 1140px;
+			height: 700px;
+			z-index: 11;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
 }
 
 
@@ -41,6 +70,10 @@ main {
     border-radius: 20px;
     margin-bottom: 100px;
 
+		&.peek {
+			margin-bottom: 0;
+		}
+
 		.header {
 		    display: inline-block;
 				margin-bottom: 40px;
@@ -62,17 +95,31 @@ main {
 			margin: 20px auto 0 auto;
 			position: relative;
 			padding-left: 80px;
+			padding-right: 40px;
 			text-align: center;
-			width: 350px;
+			width: 400px;
 			min-height: 86px;
 
 			&.no-bottom-border-radius {
 				border-radius: 10px 10px 0 0;
 			}
-		}
 
-		.group:hover .group-chevron {
-			transform: translateY(-50%);
+			&:hover .group-chevron {
+				transform: translateY(-50%);
+			}
+
+			.peek {
+				position: absolute;
+				top: 0;
+				right: 0;
+				height: 100%;
+				border-radius: 0 10px 10px 0;
+				outline: 0 !important;
+
+				&.no-bottom-right-border-radius {
+					border-radius: 0 10px 0 0;
+				}
+			}
 		}
 
 		.group-chevron {
@@ -116,7 +163,7 @@ main {
 			}
 
 			.clone-file {
-				width: 350px;
+				width: 400px;
 				margin: 0 auto 20px auto;
 
 				& button {

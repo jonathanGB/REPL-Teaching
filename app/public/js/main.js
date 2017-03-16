@@ -147,6 +147,26 @@ $(function() {
 				}
 			})
 		})
+
+		$(document).on('click', '.peek', function(e) {
+			e.preventDefault()
+
+			// TODO: create iframe
+			$('iframe').attr('src', `${this.parentNode.parentNode.href}/?minimal=true`)
+		})
+
+		$('iframe').on('load', function(e) {
+			console.log('loaded')
+			$('iframe, .cover').fadeIn(600)
+		})
+
+		$('.cover').click(removeLightbox)
+
+		$(document).keyup(function(e) {
+    	if (e.keyCode == 27) { // escape key
+        removeLightbox(e)
+		  }
+		})
 })
 
 
@@ -157,6 +177,12 @@ function updateFooterOpacity() {
     } else {
         $('footer').css('opacity', 0.7)
     }
+}
+
+function removeLightbox(e) {
+	e.preventDefault()
+
+	$('iframe, .cover').fadeOut(600)
 }
 
 toastr.options = {
