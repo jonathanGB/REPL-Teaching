@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GroupRoutes(router *gin.Engine, s *mgo.Session) {
+func GroupRoutes(router *gin.Engine, s *mgo.Session, hub *Hub) {
 	gc := controllers.NewGroupController(s)
 	fc := controllers.NewFileController(s)
 
@@ -38,7 +38,9 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 				{
 					file.GET("/", fc.ShowFile)
 
-					file.GET("/ws", fc.EditorWSHandler)
+					file.GET("/ws", func(c *gin.Context) {
+						fc.EditorWSHandler(c, hub)
+					})
 					// file.PUT("/", fc.IsFileOwner(true), fc.UpdateFile)
 
 					file.POST("/clone", auth.IsProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)

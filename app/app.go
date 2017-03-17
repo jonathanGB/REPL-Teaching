@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/jonathanGB/REPL-Teaching/app/routes"
+	"github.com/jonathanGB/REPL-Teaching/app/controllers"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"net/http"
@@ -34,10 +35,12 @@ func getMainEngine() *gin.Engine {
 	app.StaticFile("/favicon.ico", "./public/img/favicon.ico")
 	app.HTMLRender = templateRender()
 
+	hub := controllers.NewHub(s)
+
 	// add routes
 	routes.FooBarRoutes(app, s)
 	routes.UserRoutes(app, s)
-	routes.GroupRoutes(app, s)
+	routes.GroupRoutes(app, s, hub)
 	app.NoRoute(func (c *gin.Context) {
 		c.HTML(http.StatusNotFound, "not-found", gin.H{
 			"title": "404 - not found",
