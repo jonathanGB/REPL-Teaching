@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/jonathanGB/REPL-Teaching/app/routes"
+	"github.com/jonathanGB/REPL-Teaching/app/services/run"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"net/http"
@@ -60,5 +61,6 @@ func initDB() *mgo.Session {
 func main() {
 	defer s.Close() // mongodb session
 
+	go run.Run("localhost:8081")
 	getMainEngine().Run(":8080")
 }
