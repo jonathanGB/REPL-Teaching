@@ -331,6 +331,7 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 		case "update-status":
 			err = fc.model.UpdateFile("isPrivate", gId, file.Id, wsPayload.NewStatus)
 			wsResponse.Err = (err != nil)
+			wsResponse.Data = fmt.Sprintf("%v", wsPayload.NewStatus)
 		}
 
 		wsResponse.Type = wsPayload.Type
