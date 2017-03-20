@@ -43,7 +43,6 @@ func extractTar(r io.Reader) (tarContent io.ReadWriter, err error) {
 	// Open the tar archive for reading.
 	tr := tar.NewReader(r)
 
-	// Iterate through the files in the archive.
 	_, err = tr.Next()
 	if err != nil {
 		return nil, err
