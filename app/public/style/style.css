@@ -154,6 +154,13 @@ button.add {
   height: 500px;
   margin: 0; }
 
+#results {
+  height: 100px; }
+  #results.error .ace_line {
+    color: red; }
+  #results.no-error .ace_line {
+    color: green; }
+
 main.editor > div {
   margin-bottom: 50px; }
   main.editor > div button {

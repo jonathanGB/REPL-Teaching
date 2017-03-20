@@ -21,9 +21,7 @@ func Run(port string) {
 			resCode = http.StatusBadRequest
 		}
 
-		c.JSON(resCode, gin.H{
-			"response": string(res),
-		})
+		c.String(resCode, string(res))
 	})
 
 	runService.Run(port)

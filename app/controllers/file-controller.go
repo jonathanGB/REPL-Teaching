@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -11,7 +12,9 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -23,7 +26,7 @@ var (
 
 	wsupgrader = websocket.Upgrader{
 		ReadBufferSize:  10240,
-		WriteBufferSize: 1024,
+		WriteBufferSize: 10240,
 	}
 )
 
@@ -50,8 +53,8 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 	files := fc.model.GetGroupFiles(gInfo.Teacher, gInfo.Id, user.Id, user.Role)
 
 	c.HTML(http.StatusOK, "user-files", gin.H{
-		"title": "Files list",
-		"role":  user.Role,
+		"title":  "Files list",
+		"role":   user.Role,
 		"userId": user.Id.Hex(),
 		"group": gin.H{
 			"Id":      gInfo.Id.Hex(),
@@ -203,7 +206,7 @@ func (fc *FileController) ShowFile(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, view, gin.H{
-		"title": fmt.Sprintf("edit %s", file.Name),
+		"title":   fmt.Sprintf("edit %s", file.Name),
 		"groupId": gId.Hex(),
 		"editor": gin.H{
 			"fileName":      file.Name,
@@ -276,13 +279,14 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 	file := c.MustGet("file").(*models.File)
 	gId := c.MustGet("group").(*models.GroupInfo).Id
 	wsPayload := struct {
-		Type string `json:"type"`
-		Content string `json:"content"`
-		NewStatus bool `json:"newStatus"`
+		Type      string `json:"type"`
+		Content   string `json:"content"`
+		NewStatus bool   `json:"newStatus"`
 	}{}
 	wsResponse := struct {
 		Type string `json:"type"`
-		Err bool `json:"err"`
+		Err  bool   `json:"err"`
+		Data string `json:"data"`
 	}{}
 	// TODO: Register user to hub
 
@@ -307,7 +311,13 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 
 		switch wsPayload.Type {
 		case "run":
-			fmt.Println("run") // TODO: link with run service
+			if wsPayload.Content == "" {
+				err = fmt.Errorf("fichier vide")
+			} else {
+				res, err := runScript(&wsPayload.Content, file.Extension)
+				wsResponse.Data = *res
+				wsResponse.Err = (err != nil)
+			}
 		case "update-content":
 			newContent := []byte(wsPayload.Content)
 			newContentSize := len(newContent)
@@ -317,12 +327,13 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 			} else {
 				err = fc.model.UpdateFile("content", gId, file.Id, newContent, readableByteSize(int64(newContentSize)))
 			}
+			wsResponse.Err = (err != nil)
 		case "update-status":
 			err = fc.model.UpdateFile("isPrivate", gId, file.Id, wsPayload.NewStatus)
+			wsResponse.Err = (err != nil)
 		}
 
 		wsResponse.Type = wsPayload.Type
-		wsResponse.Err = (err != nil)
 
 		if err != nil {
 			fmt.Println("err in ws", err)
@@ -339,4 +350,33 @@ func readableByteSize(size int64) string {
 
 	kiloSize := float32(size) / 1000
 	return fmt.Sprintf("%.1fkB", kiloSize)
+}
+
+func runScript(script *string, extension string) (*string, error) {
+	apiUrl := "http://localhost:8081/run"
+	data := url.Values{}
+	data.Set("extension", extension)
+	data.Set("content", *script)
+
+	client := &http.Client{}
+	r, _ := http.NewRequest("POST", apiUrl, bytes.NewBufferString(data.Encode()))
+	r.Header.Add("content-type", "application/x-www-form-urlencoded")
+
+	resp, err := client.Do(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	strBody := string(body)
+
+	if resp.StatusCode != http.StatusOK {
+		return &strBody, fmt.Errorf("erreur provenant du service de run")
+	} else {
+		return &strBody, nil
+	}
 }

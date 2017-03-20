@@ -3,18 +3,18 @@ package run
 import (
 	"archive/tar"
 	"bytes"
+	"context"
 	"fmt"
-	"github.com/docker/docker/client"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"io/ioutil"
+	"github.com/docker/docker/client"
 	"io"
-	"context"
+	"io/ioutil"
 	"time"
 )
 
 func createTar(content []byte, extension string) (io.Reader, error) {
-	// Create a buffer to write our archive to.
+	// Create a buffer to write our archive to
 	buf := new(bytes.Buffer)
 	tw := tar.NewWriter(buf)
 
@@ -68,7 +68,7 @@ func runQuery(script []byte, extension string) ([]byte, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
@@ -77,6 +77,9 @@ func runQuery(script []byte, extension string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating %v", err)
 	}
+	defer cli.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{
+		Force: true,
+	})
 
 	if err = cli.CopyToContainer(ctx, resp.ID, "/runs/", scriptTarReader, types.CopyToContainerOptions{}); err != nil {
 		return nil, fmt.Errorf("copyto %v", err)
@@ -86,9 +89,9 @@ func runQuery(script []byte, extension string) ([]byte, error) {
 		return nil, fmt.Errorf("starting %v", err)
 	}
 
-  if _, err = cli.ContainerWait(ctx, resp.ID); err != nil {
-  	return nil, err
-  }
+	if _, err = cli.ContainerWait(ctx, resp.ID); err != nil {
+		return nil, err
+	}
 
 	tarReader, _, err := cli.CopyFromContainer(ctx, resp.ID, "/runs/out")
 	if err != nil {
@@ -105,7 +108,7 @@ func runQuery(script []byte, extension string) ([]byte, error) {
 		return nil, err
 	}
 	firstLineMarker := bytes.Index(allContent, []byte("\n"))
-	content := allContent[firstLineMarker + 1:]
+	content := allContent[firstLineMarker+1:]
 
 	if firstLineMarker > 0 && string(allContent[:firstLineMarker]) == "ok" {
 		return content, nil

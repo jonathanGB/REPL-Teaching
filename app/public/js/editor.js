@@ -1,6 +1,7 @@
 $(function() {
 	const MAX_FILE_SIZE = 10000 // 10kB
 	let editorElem = $('#editor')
+	let resultsElem = $('#results')
   let editor = ace.edit("editor")
 	let extensionLangMap = {
 		js: 'javascript',
@@ -22,10 +23,27 @@ $(function() {
   let results = ace.edit("results");
   results.setReadOnly(true);
   results.setShowPrintMargin(false);
+	results.setOptions({
+    maxLines: 30
+	});
 
 	const socket = new WebSocket(wsURL)
 	socket.onopen = () => {
 		console.log('connected')
+
+		$('#runFile').click(function(e) {
+			let content = editor.getValue()
+			if (content.length > MAX_FILE_SIZE) {
+				toastr.error("Le fichier dépasse la limite de 10kB")
+				return
+			}
+
+			let toSend = {
+				type: "run",
+				content
+			}
+			socket.send(JSON.stringify(toSend))
+		})
 
 		$('#saveFile').click(function(e) {
 			let content = editor.getValue()
@@ -57,6 +75,17 @@ $(function() {
 
 		socket.onmessage = (e) => {
 			let payload = JSON.parse(e.data)
+
+			switch (payload.type) {
+				case "run":
+					results.setValue(payload.data, -1)
+
+					if (payload.err) {
+						resultsElem.removeClass('no-error').addClass('error')
+					} else {
+						resultsElem.removeClass('error').addClass('no-error')
+					}
+			}
 			console.log(payload)
 		}
 

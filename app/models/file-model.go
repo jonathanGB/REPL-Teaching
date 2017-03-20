@@ -14,16 +14,16 @@ type (
 	}
 
 	File struct {
-		Id           bson.ObjectId `bson:"_id"`
-		Name         string        `bson:"name"`
-		Owner        bson.ObjectId `bson:"owner"`
-		OwnerName    string        `bson:"ownerName"`
-		OwnerEmail   string        `bson:"ownerEmail"`
-		Extension    string        `bson:"extension"`
-		Content      []byte        `bson:"content"`
-		Size         string        `bson:"size"`
-		IsPrivate    bool          `bson:"isPrivate"`
-		LastModified time.Time     `bson:"lastModified"`
+		Id           bson.ObjectId   `bson:"_id"`
+		Name         string          `bson:"name"`
+		Owner        bson.ObjectId   `bson:"owner"`
+		OwnerName    string          `bson:"ownerName"`
+		OwnerEmail   string          `bson:"ownerEmail"`
+		Extension    string          `bson:"extension"`
+		Content      []byte          `bson:"content"`
+		Size         string          `bson:"size"`
+		IsPrivate    bool            `bson:"isPrivate"`
+		LastModified time.Time       `bson:"lastModified"`
 		ClonedBy     map[string]bool `bson:"clonedBy"`
 	}
 
@@ -114,7 +114,7 @@ func (fm *FileModel) IsThereUserFile(fileName string, gId, uId bson.ObjectId) bo
 	fmt.Println(fileName, gId, uId)
 
 	fm.db.C("groups").Find(bson.M{
-		"_id":         gId,
+		"_id": gId,
 		"files": bson.M{
 			"$elemMatch": bson.M{
 				"owner": uId,

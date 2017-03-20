@@ -39,7 +39,7 @@ func getMainEngine() *gin.Engine {
 	routes.FooBarRoutes(app, s)
 	routes.UserRoutes(app, s)
 	routes.GroupRoutes(app, s)
-	app.NoRoute(func (c *gin.Context) {
+	app.NoRoute(func(c *gin.Context) {
 		c.HTML(http.StatusNotFound, "not-found", gin.H{
 			"title": "404 - not found",
 		})
