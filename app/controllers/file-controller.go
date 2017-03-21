@@ -68,29 +68,37 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 }
 
 func (fc *FileController) CreateFile(c *gin.Context) {
+	var (
+		fileSize int64
+		fileContent = make([]byte, 0)
+	)
+
 	// get file, verify size
 	mFile, _, err := c.Request.FormFile("fileContent")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "file is absent / could not be parsed",
-		})
-		return
-	}
+	if err == nil {
+		fileSize, err = mFile.Seek(0, io.SeekEnd)
+		mFile.Seek(0, io.SeekStart)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "internal error",
+			})
+			return
+		}
 
-	fileSize, err := mFile.Seek(0, io.SeekEnd)
-	mFile.Seek(0, io.SeekStart)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "internal error",
-		})
-		return
-	}
+		if fileSize > MAX_FILE_SIZE {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "size limit is 10kB",
+			})
+			return
+		}
 
-	if fileSize > MAX_FILE_SIZE {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "size limit is 10kB",
-		})
-		return
+		fileContent = make([]byte, fileSize)
+		if _, err := io.ReadFull(mFile, fileContent); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erreur lors de la lecture du fichier",
+			})
+			return
+		}
 	}
 
 	// get other params
@@ -116,13 +124,6 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 	}
 
 	fId := bson.NewObjectId()
-	fileContent := make([]byte, fileSize)
-	if _, err := io.ReadFull(mFile, fileContent); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erreur lors de la lecture du fichier",
-		})
-		return
-	}
 
 	file := models.File{
 		fId,
