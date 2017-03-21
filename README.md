@@ -37,7 +37,7 @@ Pour déployer localement, il est nécessaire d'avoir **Go** (`GOPATH` bien conf
 
 ##### À mentionner que ce script doit être lancé à partir du même dossier, sinon les références relatives vont être disfonctionnelles. (i.e. lancer `./deploy.bash` et non `./app/deploy.bash`)
 
-Si ce n'est pas déjà fait, il faut s'assurer que l'utilisateur lançant le script de déploiement est le "owner" du dossier des données `/data/db`. Si ce n'est pas le cas, simplement exécuter `chown -R <USER> /data`.
+Si ce n'est pas déjà fait, il faut s'assurer que l'utilisateur lançant le script de déploiement est le "owner" du dossier des données `/data/db`. Si ce n'est pas le cas, simplement exécuter `sudo chown -R <USER> /data`.
 
 Certains *flags* sont disponibles pour lancer le script, les voici:
 * `--install`: installer les dépendances **go**
