@@ -7,7 +7,10 @@ $(function() {
   let editor = ace.edit("editor")
 	let extensionLangMap = {
 		js: 'javascript',
-		go: 'golang'
+		go: 'golang',
+		py: 'python',
+		rb: 'ruby',
+		exs: 'elixir'
 	}
 	let wsURL =`ws://${location.host}${location.pathname}ws`
 	let isOwner = editorElem.data('isowner')

@@ -1,4 +1,4 @@
-const ALLOWED_EXTENSIONS = new Set(["go", "js"])
+const ALLOWED_EXTENSIONS = new Set(["go", "js", "py", "rb", "exs"])
 
 
 $(function() {
@@ -154,7 +154,6 @@ $(function() {
 		})
 
 		$('iframe').on('load', function(e) {
-			console.log('loaded')
 			$('iframe, .cover').fadeIn(600)
 		})
 

@@ -22,6 +22,9 @@ var (
 	ALLOWED_EXTENSIONS = map[string]bool{
 		"go": true,
 		"js": true,
+		"py": true,
+		"rb": true,
+		"exs": true,
 	}
 
 	wsupgrader = websocket.Upgrader{
