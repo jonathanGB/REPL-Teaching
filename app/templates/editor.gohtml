@@ -33,11 +33,14 @@
 				<button class="btn btn-success" id="saveFile">Sauver <span class="glyphicon glyphicon-save"></span></button>
 			{{end}}
 			<!-- Enable button once connection is made -->
-			<button class="btn btn-info disabled" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
+			<button class="btn btn-info" id="runFile">Rouler <span class="glyphicon glyphicon-cog"></span></button>
 
 		</div>
 	</nav>
 	<pre id="editor" data-isowner="{{.editor.isFileOwner}}" data-extension="{{.editor.fileExtension}}" data-code="{{.editor.fileContent}}"></pre>
 	<pre id="results"></pre>
+	<div id="loader">
+  	<img src="/public/img/big-loader.gif" alt="loader gif">
+	</div>
 </main>
 {{end}}

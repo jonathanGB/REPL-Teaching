@@ -1,2 +1,3 @@
 maquettes/* linguist-vendored
 *.gohtml linguist-language=HTML
+*.dockerfile linguist-language=Shell

@@ -76,9 +76,9 @@ func (gc *GroupController) CreateGroup(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error": nil,
-			"data":  gin.H{
-				"id": gId,
-				"groupName": gName,
+			"data": gin.H{
+				"id":          gId,
+				"groupName":   gName,
 				"teacherName": user.Name,
 			},
 		})
@@ -142,8 +142,8 @@ func (gc *GroupController) ShowJoiningGroup(c *gin.Context) {
 	c.HTML(http.StatusOK, "join-group", gin.H{
 		"title": fmt.Sprintf("Join %s", gInfo.Name),
 		"group": gin.H{
-			"Id":   gInfo.Id.Hex(),
-			"Name": gInfo.Name,
+			"Id":      gInfo.Id.Hex(),
+			"Name":    gInfo.Name,
 			"Teacher": gInfo.TeacherName,
 		},
 	})

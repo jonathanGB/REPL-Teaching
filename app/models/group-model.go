@@ -1,7 +1,6 @@
 package models
 
 import (
-	//"golang.org/x/crypto/bcrypt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

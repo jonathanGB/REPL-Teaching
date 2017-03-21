@@ -1,11 +1,9 @@
-const ALLOWED_EXTENSIONS = new Set(["go", "js"])
+const ALLOWED_EXTENSIONS = new Set(["go", "js", "py", "rb", "exs"])
 
 
 $(function() {
     // at the beginning
     updateFooterOpacity()
-    $('[data-toggle="popover"]').popover();
-
 
     // events
     $(window).scroll(updateFooterOpacity)
@@ -103,8 +101,9 @@ $(function() {
 			e.preventDefault()
 
 			let gId = $(this).data('groupid')
+			let files = document.getElementById('fileContentInput').files
 
-			if ($('#fileContentInput')[0].files[0].size > MAX_FILE_SIZE) {
+			if (files.length > 0 && $('#fileContentInput')[0].files[0].size > MAX_FILE_SIZE) {
 				toastr.error('Les fichiers ne peuvent pas dépasser 10kB')
 				return
 			}
@@ -156,7 +155,6 @@ $(function() {
 		})
 
 		$('iframe').on('load', function(e) {
-			console.log('loaded')
 			$('iframe, .cover').fadeIn(600)
 		})
 
