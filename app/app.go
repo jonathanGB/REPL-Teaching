@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
-	"github.com/jonathanGB/REPL-Teaching/app/routes"
 	"github.com/jonathanGB/REPL-Teaching/app/controllers"
+	"github.com/jonathanGB/REPL-Teaching/app/routes"
 	"github.com/jonathanGB/REPL-Teaching/app/services/run"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
@@ -42,7 +42,7 @@ func getMainEngine() *gin.Engine {
 	routes.FooBarRoutes(app, s)
 	routes.UserRoutes(app, s)
 	routes.GroupRoutes(app, s, hub)
-	app.NoRoute(func (c *gin.Context) {
+	app.NoRoute(func(c *gin.Context) {
 		c.HTML(http.StatusNotFound, "not-found", gin.H{
 			"title": "404 - not found",
 		})

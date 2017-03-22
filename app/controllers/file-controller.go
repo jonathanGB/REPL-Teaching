@@ -20,10 +20,10 @@ import (
 
 var (
 	ALLOWED_EXTENSIONS = map[string]bool{
-		"go": true,
-		"js": true,
-		"py": true,
-		"rb": true,
+		"go":  true,
+		"js":  true,
+		"py":  true,
+		"rb":  true,
 		"exs": true,
 	}
 
@@ -69,7 +69,7 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 
 func (fc *FileController) CreateFile(c *gin.Context) {
 	var (
-		fileSize int64
+		fileSize    int64
 		fileContent = make([]byte, 0)
 	)
 

@@ -34,7 +34,7 @@ type (
 	}
 
 	GroupId struct {
-		Id          bson.ObjectId `bson:"_id"`
+		Id bson.ObjectId `bson:"_id"`
 	}
 )
 

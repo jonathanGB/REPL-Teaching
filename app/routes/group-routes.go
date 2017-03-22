@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GroupRoutes(router *gin.Engine, s *mgo.Session, hub *Hub) {
+func GroupRoutes(router *gin.Engine, s *mgo.Session, hub *controllers.Hub) {
 	gc := controllers.NewGroupController(s)
 	fc := controllers.NewFileController(s)
 
