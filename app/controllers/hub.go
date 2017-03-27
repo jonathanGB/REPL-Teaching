@@ -112,7 +112,7 @@ func (c *Class) alertStatusUpdate(user *auth.PublicUser, fId bson.ObjectId, newS
 	c.toStudentsInMenu <- &m
 }
 
-func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, newContent []byte, isPrivate bool, readableSize, lastModified string) {
+func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, newContent string, cursorPosition map[string]int, isPrivate bool, readableSize, lastModified string) {
 	// encode file update data (meta & all data separately)
 	metaData := make(map[string]interface{})
 	metaData["size"] = readableSize
@@ -122,6 +122,8 @@ func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, new
 	allData["size"] = readableSize
 	allData["lastModified"] = lastModified
 	allData["content"] = newContent
+	allData["row"] = cursorPosition["row"]
+	allData["column"] = cursorPosition["column"]
 
 	// encode ws response
 	metaDataRes := WSResponse{

@@ -52,9 +52,16 @@ func NewFileController(s *mgo.Session) *FileController {
 func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 	gInfo := c.MustGet("group").(*models.GroupInfo)
 	user := c.MustGet("user").(*auth.PublicUser)
+	minimal := c.Query("minimal")
+
+	if minimal == "true" {
+		c.HTML(http.StatusUnauthorized, "not-found", gin.H{
+			"minimal": true,
+		})
+		return
+	}
 
 	files := fc.model.GetGroupFiles(gInfo.Teacher, gInfo.Id, user.Id, user.Role)
-
 	c.HTML(http.StatusOK, "user-files", gin.H{
 		"title":  "Files list",
 		"role":   user.Role,
@@ -154,6 +161,7 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 func (fc *FileController) IsFileVisible(c *gin.Context) {
 	fIdHex := c.Param("fileId")
 	group := c.MustGet("group").(*models.GroupInfo)
+	minimal := c.Query("minimal")
 
 	if !bson.IsObjectIdHex(fIdHex) {
 		c.Abort()
@@ -179,7 +187,11 @@ func (fc *FileController) IsFileVisible(c *gin.Context) {
 	}
 
 	c.Abort()
-	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files", group.Id.Hex()))
+	query := ""
+	if minimal != "" {
+		query = "?minimal=true"
+	}
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files/%s", group.Id.Hex(), query))
 }
 
 func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
@@ -285,9 +297,10 @@ func (fc *FileController) WSEditorOwner(c *gin.Context, class *Class) {
 
 	for {
 		wsPayload := struct {
-			Type      string `json:"type"`
-			Content   string `json:"content"`
-			NewStatus bool   `json:"newStatus"`
+			Type           string         `json:"type"`
+			Content        string         `json:"content"`
+			NewStatus      bool           `json:"newStatus"`
+			CursorPosition map[string]int `json:"cursorPosition"`
 		}{}
 		wsResponse := WSResponse{}
 
@@ -324,14 +337,14 @@ func (fc *FileController) WSEditorOwner(c *gin.Context, class *Class) {
 
 				// alert class
 				if err == nil {
-					go class.alertContentUpdate(user, file.Id, newContent, file.IsPrivate, newReadableContentSize, time.Now().Format("02 Jan 15:04"))
+					go class.alertContentUpdate(user, file.Id, wsPayload.Content, wsPayload.CursorPosition, file.IsPrivate, newReadableContentSize, time.Now().Format("02 Jan 15:04"))
 				}
 			}
 			wsResponse.Err = (err != nil)
 		case "update-status":
 			err = fc.model.UpdateFile("isPrivate", gId, file.Id, wsPayload.NewStatus)
 			wsResponse.Err = (err != nil)
-			wsResponse.Data = fmt.Sprintf("%v", wsPayload.NewStatus)
+			wsResponse.Data = wsPayload.NewStatus
 
 			if err == nil {
 				go class.alertStatusUpdate(user, file.Id, wsPayload.NewStatus)

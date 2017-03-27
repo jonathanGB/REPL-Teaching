@@ -31,6 +31,8 @@ $(function() {
 	});
 
 	const socket = new WebSocket(wsURL)
+
+
 	socket.onopen = () => {
 		console.log('connected')
 
@@ -54,6 +56,8 @@ $(function() {
 			wsFeedback(this, 'sending')
 
 			let content = editor.getValue()
+			let cursorPosition = editor.getCursorPosition()
+
 			if (content.length > MAX_FILE_SIZE) {
 				toastr.error("Le fichier dépasse la limite de 10kB")
 				return
@@ -61,7 +65,8 @@ $(function() {
 
 			let toSend = {
 				type: "update-content",
-				content
+				content,
+				cursorPosition,
 			}
 			socket.send(JSON.stringify(toSend))
 		})
@@ -93,23 +98,36 @@ $(function() {
 					}
 					break
 				case "update-content":
-					wsFeedback(document.getElementById("saveFile"), "receiving")
+					if (isOwner) {
+						wsFeedback(document.getElementById("saveFile"), "receiving")
 
-					if (payload.err) {
-						toastr.error("Erreur lors de la sauvegarde du fichier")
+						if (payload.err) {
+							toastr.error("Erreur lors de la sauvegarde du fichier")
+						} else {
+							toastr.success("Fichier sauvegardé!")
+						}
 					} else {
-						toastr.success("Fichier sauvegardé!")
+						editor.setValue(payload.data.content)
+						editor.gotoLine(payload.data.row + 1, payload.data.column, true)
+console.log(payload.data.row, payload.data.column)
+						toastr.success("Fichier mis-à-jour!")
 					}
+
 					break
 				case "update-status":
 					let that = $('#changeStatus')
-					let newStatus = payload.data === "true"
+					let newStatus = payload.data
 
 					if (payload.err) {
 						toastr.error("Erreur lors du changement de statut")
-					} else {
+					} else if (isOwner) {
 						that.data('status', newStatus)
 						that.children('.status-text').text(!newStatus ? "Public" : "Privé").siblings('.file-status').removeClass(`${!newStatus}`).addClass(`${newStatus}`)
+					} else if (newStatus) {
+						toastr.error("Le fichier est rendu privé", "", {timeOut: 0})
+					} else {
+						toastr.clear()
+						toastr.success("Le fichier est de nouveau public!")
 					}
 			}
 			console.log(payload)

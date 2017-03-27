@@ -4,6 +4,7 @@ const ALLOWED_EXTENSIONS = new Set(["go", "js", "py", "rb", "exs"])
 $(function() {
     // at the beginning
     updateFooterOpacity()
+		$('[data-toggle="popover"]').popover();
 
     // events
     $(window).scroll(updateFooterOpacity)
@@ -178,7 +179,7 @@ function updateFooterOpacity() {
 }
 
 function removeLightbox(e) {
-	e.preventDefault()
+	if (e) e.preventDefault()
 
 	$('iframe, .cover').fadeOut(600)
 }
