@@ -489,41 +489,7 @@ func (fc *FileController) WSInMenu(c *gin.Context, class *Class) {
 		class.toStudentsInMenu <- &m
 	}
 
-	go client.writePump()
-
-	for {
-		wsPayload := struct {
-			Type      string `json:"type"`
-			Content   string `json:"content"`
-			NewStatus bool   `json:"newStatus"`
-		}{}
-		//wsResponse := WSResponse{}
-
-		t, msg, err := conn.ReadMessage()
-		if err != nil {
-			fmt.Println("closed")
-
-			if user.Role == "teacher" {
-				class.unRegisterTeacherInMenu <- &client
-			} else {
-				class.unRegisterStudentInMenu <- &client
-			}
-
-			break
-		}
-
-		if err := json.Unmarshal(msg, &wsPayload); err != nil {
-			conn.WriteMessage(t, []byte("\"bad payload\""))
-			continue
-		}
-
-		fmt.Println(wsPayload)
-
-		// TODO: update cases
-		switch wsPayload.Type {
-		case "add-file":
-		}
-	}
+	client.writePump()
 }
 
 func readableByteSize(size int64) string {

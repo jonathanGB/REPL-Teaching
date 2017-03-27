@@ -8,7 +8,7 @@ Deux types d'utilisateurs existent:
 2. les étudiants.
 
 #### Objectifs
-Un professeur peut déployer pour sa classe des extraits (*snippets*) de code, que les étudiants pourront ensuite cloner pour modifier individuellement. Le professeur peut voir un tableau de bord qui montrera les changements et activités des étudiants en temps réel, que le professeur peut utiliser comme mesure de participation des étudiants ou pour des fins de discussion devant la classe. Évidemment, les extraits de code seront exécutables directement dans le navigateur (REPL), avec un éditeur de texte adapté pour du code.
+Un professeur peut déployer pour sa classe des extraits (*snippets*) de code, que les étudiants pourront ensuite cloner pour modifier individuellement. Tous sont libres de créer leurs propres fichiers aussi. Le professeur et les étudiants ont accès à un tableau de bord qui montre les fichiers visibles pour le groupe et qui est mis-à-jour en temps-réel. Le professeur peut utiliser cette plateforme comme mesure de participation des étudiants ou pour des fins de discussion devant la classe. Évidemment, les extraits de code seront exécutables directement dans le navigateur (REPL), avec un éditeur de texte adapté pour du code.
 
 #### Technologies
 * HTML5 & CSS3
@@ -35,7 +35,7 @@ Un professeur peut déployer pour sa classe des extraits (*snippets*) de code, q
 #### Comment déployer
 Pour déployer localement, il est nécessaire d'avoir **Go** (`GOPATH` bien configuré aussi) et **MongoDB** d'installés (le dossier par défaut pour les données doit être utilisé `/data/db`). Un script `deploy.bash` permet ensuite d'installer automatiquement les dépendances **go** du projet, configurer la base de données, bâtir les images docker manquantes, et lancer le tout. Ce script est écrit pour les sytèmes **UN*X**.
 
-##### À mentionner que ce script doit être lancé à partir du même dossier, sinon les références relatives vont être disfonctionnelles. (i.e. lancer `./deploy.bash` et non `./app/deploy.bash`)
+##### À noter que ce script doit être lancé à partir du même dossier, sinon les références relatives vont être disfonctionnelles. (i.e. lancer `./deploy.bash` et non `./app/deploy.bash`)
 
 Si ce n'est pas déjà fait, il faut s'assurer que l'utilisateur lançant le script de déploiement est le "owner" du dossier des données `/data/db`. Si ce n'est pas le cas, simplement exécuter `sudo chown -R <USER> /data`.
 

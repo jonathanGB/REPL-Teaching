@@ -131,8 +131,6 @@ func (c *Class) alertEditorStatus(status, uRole string, fId bson.ObjectId) {
 		uRole,
 	}
 
-	fmt.Println(status, uRole)
-
 	c.toPublicEditors <- &editorM
 
 	// alert others in menu of LIVE editing
