@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/jonathanGB/REPL-Teaching/app/auth"
 	"github.com/jonathanGB/REPL-Teaching/app/controllers"
+	"github.com/jonathanGB/REPL-Teaching/app/models"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"net/http"
 )
 
-func GroupRoutes(router *gin.Engine, s *mgo.Session) {
+func GroupRoutes(router *gin.Engine, s *mgo.Session, hub controllers.Hub) {
 	gc := controllers.NewGroupController(s)
 	fc := controllers.NewFileController(s)
 
@@ -30,19 +31,33 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session) {
 
 			files := group.Group("/files", gc.IsGroupMember(true))
 			{
-				// TODO: dummy response for now
 				files.GET("/", gc.IsGroupMember(true), fc.ShowGroupFiles)
 				files.POST("/", gc.IsGroupMember(true), fc.CreateFile)
 
-				file := files.Group("/:fileId", fc.IsFileVisible)
-				{
-					file.GET("/", fc.ShowFile)
+				// TODO: add ws handlers in the menu
+				files.GET("/ws", func(c *gin.Context) {
+					gId := c.MustGet("group").(*models.GroupInfo).Id
 
-					file.GET("/ws", fc.EditorWSHandler)
-					// file.PUT("/", fc.IsFileOwner(true), fc.UpdateFile)
+					fc.WSInMenu(c, hub[gId])
+				})
+			}
+			file := group.Group("/file/:fileId", gc.IsGroupMember(true), fc.IsFileVisible)
+			{
+				file.GET("/", fc.ShowFile)
 
-					file.POST("/clone", auth.IsProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
-				}
+				file.GET("/ws", func(c *gin.Context) {
+					uId := c.MustGet("user").(*auth.PublicUser).Id
+					fOwner := c.MustGet("file").(*models.File).Owner
+					gId := c.MustGet("group").(*models.GroupInfo).Id
+
+					if uId == fOwner {
+						fc.WSEditorOwner(c, hub[gId])
+					} else {
+						fc.WSEditorObserver(c, hub[gId])
+					}
+				})
+
+				file.POST("/clone", auth.IsProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
 			}
 		}
 	}

@@ -70,6 +70,11 @@ main {
     text-align: center;
     width: 400px;
     min-height: 86px; }
+    main .group .live {
+      opacity: 0;
+      transition: opacity 0.7s; }
+    main .group.online .live {
+      opacity: 1; }
     main .group.no-bottom-border-radius {
       border-radius: 10px 10px 0 0; }
     main .group:hover .group-chevron {
@@ -201,18 +206,19 @@ main.editor .right-nav button {
   color: white;
   font-size: 15px;
   cursor: pointer; }
-  #changeStatus .file-status {
-    width: 20px;
-    height: 20px;
-    border-radius: 10px;
-    display: inline-block;
-    margin: 0 10px 0 4px;
-    vertical-align: middle;
-    transition: background-color 1s; }
-    #changeStatus .file-status.true {
-      background: red; }
-    #changeStatus .file-status.false {
-      background: #92ef95; }
+
+.file-status {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: inline-block;
+  margin: 0 10px 0 4px;
+  vertical-align: middle;
+  transition: background-color 1s; }
+  .file-status.true {
+    background: red; }
+  .file-status.false {
+    background: #92ef95; }
 
 #loader {
   display: none;

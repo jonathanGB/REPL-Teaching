@@ -32,6 +32,10 @@ type (
 		Name        string
 		TeacherName string
 	}
+
+	GroupId struct {
+		Id bson.ObjectId `bson:"_id"`
+	}
 )
 
 func NewGroupModel(s *mgo.Session) *GroupModel {
@@ -94,4 +98,12 @@ func (gm *GroupModel) JoinGroup(gId, userId bson.ObjectId) error {
 			"$push": bson.M{"groups": gId},
 		},
 	)
+}
+
+func (gm *GroupModel) GetAllGroupIds() []GroupId {
+	result := []GroupId{}
+
+	gm.db.C("groups").Find(nil).Select(bson.M{"_id": 1}).All(&result)
+
+	return result
 }

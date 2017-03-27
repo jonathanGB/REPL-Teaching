@@ -20,10 +20,10 @@ import (
 
 var (
 	ALLOWED_EXTENSIONS = map[string]bool{
-		"go": true,
-		"js": true,
-		"py": true,
-		"rb": true,
+		"go":  true,
+		"js":  true,
+		"py":  true,
+		"rb":  true,
 		"exs": true,
 	}
 
@@ -52,13 +52,21 @@ func NewFileController(s *mgo.Session) *FileController {
 func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 	gInfo := c.MustGet("group").(*models.GroupInfo)
 	user := c.MustGet("user").(*auth.PublicUser)
+	minimal := c.Query("minimal")
+
+	if minimal == "true" {
+		c.HTML(http.StatusUnauthorized, "not-found", gin.H{
+			"minimal": true,
+		})
+		return
+	}
 
 	files := fc.model.GetGroupFiles(gInfo.Teacher, gInfo.Id, user.Id, user.Role)
-
 	c.HTML(http.StatusOK, "user-files", gin.H{
-		"title":  "Files list",
-		"role":   user.Role,
-		"userId": user.Id.Hex(),
+		"title":     "Files list",
+		"filesMenu": true,
+		"role":      user.Role,
+		"userId":    user.Id.Hex(),
 		"group": gin.H{
 			"Id":      gInfo.Id.Hex(),
 			"Teacher": gInfo.TeacherName,
@@ -69,7 +77,7 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 
 func (fc *FileController) CreateFile(c *gin.Context) {
 	var (
-		fileSize int64
+		fileSize    int64
 		fileContent = make([]byte, 0)
 	)
 
@@ -146,7 +154,7 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error":    nil,
-			"redirect": fmt.Sprintf("/groups/%s/files/%s", gId.Hex(), fId.Hex()),
+			"redirect": fmt.Sprintf("/groups/%s/file/%s", gId.Hex(), fId.Hex()),
 		})
 	}
 }
@@ -154,6 +162,7 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 func (fc *FileController) IsFileVisible(c *gin.Context) {
 	fIdHex := c.Param("fileId")
 	group := c.MustGet("group").(*models.GroupInfo)
+	minimal := c.Query("minimal")
 
 	if !bson.IsObjectIdHex(fIdHex) {
 		c.Abort()
@@ -179,7 +188,11 @@ func (fc *FileController) IsFileVisible(c *gin.Context) {
 	}
 
 	c.Abort()
-	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files", group.Id.Hex()))
+	query := ""
+	if minimal != "" {
+		query = "?minimal=true"
+	}
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/file/%s", group.Id.Hex(), query))
 }
 
 func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
@@ -266,12 +279,12 @@ func (fc *FileController) CloneFile(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error":    nil,
-			"redirect": fmt.Sprintf("/groups/%s/files/%s", gId.Hex(), fId.Hex()),
+			"redirect": fmt.Sprintf("/groups/%s/file/%s", gId.Hex(), fId.Hex()),
 		})
 	}
 }
 
-func (fc *FileController) EditorWSHandler(c *gin.Context) {
+func (fc *FileController) WSEditorOwner(c *gin.Context, class *Class) {
 	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		fmt.Println("Error connecting websocket %+v", err)
@@ -282,22 +295,26 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 	user := c.MustGet("user").(*auth.PublicUser)
 	file := c.MustGet("file").(*models.File)
 	gId := c.MustGet("group").(*models.GroupInfo).Id
-	wsPayload := struct {
-		Type      string `json:"type"`
-		Content   string `json:"content"`
-		NewStatus bool   `json:"newStatus"`
-	}{}
-	wsResponse := struct {
-		Type string `json:"type"`
-		Err  bool   `json:"err"`
-		Data string `json:"data"`
-	}{}
-	// TODO: Register user to hub
+
+	if !file.IsPrivate {
+		go class.alertEditorStatus("online", user.Role, file.Id)
+	}
 
 	for {
+		wsPayload := struct {
+			Type           string         `json:"type"`
+			Content        string         `json:"content"`
+			NewStatus      bool           `json:"newStatus"`
+			CursorPosition map[string]int `json:"cursorPosition"`
+		}{}
+		wsResponse := WSResponse{}
+
 		t, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("closed")
+			if !file.IsPrivate {
+				class.alertEditorStatus("offline", user.Role, file.Id)
+			}
 			conn.Close()
 			break
 		}
@@ -305,12 +322,6 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 		if err := json.Unmarshal(msg, &wsPayload); err != nil {
 			conn.WriteMessage(t, []byte("\"bad payload\""))
 			continue
-		}
-
-		if user.Id != file.Owner && wsPayload.Type != "run" {
-			conn.WriteMessage(t, []byte("\"non-owner cannot modify file\""))
-			conn.Close()
-			break
 		}
 
 		switch wsPayload.Type {
@@ -325,17 +336,28 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 		case "update-content":
 			newContent := []byte(wsPayload.Content)
 			newContentSize := len(newContent)
+			newReadableContentSize := readableByteSize(int64(newContentSize))
 
 			if newContentSize > MAX_FILE_SIZE {
 				err = fmt.Errorf("file too big")
 			} else {
-				err = fc.model.UpdateFile("content", gId, file.Id, newContent, readableByteSize(int64(newContentSize)))
+				err = fc.model.UpdateFile("content", gId, file.Id, newContent, newReadableContentSize)
+
+				// alert class
+				if err == nil {
+					go class.alertContentUpdate(user, file.Id, wsPayload.Content, wsPayload.CursorPosition, file.IsPrivate, newReadableContentSize, time.Now().Format("02 Jan 15:04"))
+				}
 			}
 			wsResponse.Err = (err != nil)
 		case "update-status":
 			err = fc.model.UpdateFile("isPrivate", gId, file.Id, wsPayload.NewStatus)
 			wsResponse.Err = (err != nil)
-			wsResponse.Data = fmt.Sprintf("%v", wsPayload.NewStatus)
+			wsResponse.Data = wsPayload.NewStatus
+
+			if err == nil {
+				go class.alertStatusUpdate(user, file.Id, wsPayload.NewStatus)
+				file.IsPrivate = wsPayload.NewStatus
+			}
 		}
 
 		wsResponse.Type = wsPayload.Type
@@ -345,6 +367,162 @@ func (fc *FileController) EditorWSHandler(c *gin.Context) {
 		}
 		marshalledResponse, _ := json.Marshal(&wsResponse)
 		conn.WriteMessage(t, marshalledResponse)
+	}
+}
+
+func (fc *FileController) WSEditorObserver(c *gin.Context, class *Class) {
+	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println("Error connecting websocket %+v", err)
+		return
+	}
+
+	fmt.Println("connected observer")
+	user := c.MustGet("user").(*auth.PublicUser)
+	file := c.MustGet("file").(*models.File)
+
+	client := Client{
+		class,
+		file.Id,
+		user.Id,
+		conn,
+		make(chan []byte),
+	}
+
+	class.registerEditorObserver <- &client
+	go client.writePump()
+
+	for {
+		wsPayload := struct {
+			Type      string `json:"type"`
+			Content   string `json:"content"`
+			NewStatus bool   `json:"newStatus"`
+		}{}
+		wsResponse := WSResponse{}
+
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("closed")
+			class.unRegisterEditorObserver <- &client
+
+			break
+		}
+
+		if err := json.Unmarshal(msg, &wsPayload); err != nil {
+			conn.WriteMessage(t, []byte("\"bad payload\""))
+			continue
+		}
+
+		switch wsPayload.Type {
+		case "run":
+			if wsPayload.Content == "" {
+				err = fmt.Errorf("fichier vide")
+			} else {
+				res, err := runScript(&wsPayload.Content, file.Extension)
+				wsResponse.Data = *res
+				wsResponse.Err = (err != nil)
+			}
+		}
+
+		wsResponse.Type = wsPayload.Type
+
+		if err != nil {
+			fmt.Println("err in ws", err)
+		}
+		marshalledResponse, _ := json.Marshal(&wsResponse)
+		client.send <- marshalledResponse
+	}
+}
+
+func (fc *FileController) WSInMenu(c *gin.Context, class *Class) {
+	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println("Error connecting websocket %+v", err)
+		return
+	}
+
+	fmt.Println("connected in-menu")
+	user := c.MustGet("user").(*auth.PublicUser)
+
+	client := Client{
+		class,
+		"",
+		user.Id,
+		conn,
+		make(chan []byte),
+	}
+	editorsQuery := EditorQuery{
+		user.Role,
+		make([]string, 0),
+		make(chan bool, 1),
+	}
+
+	if user.Role == "teacher" {
+		class.registerTeacherInMenu <- &client
+	} else {
+		class.registerStudentInMenu <- &client
+	}
+
+	class.getPublicEditors <- &editorsQuery
+	<-editorsQuery.done
+
+	liveResponse := WSResponse{
+		"live-editing",
+		false,
+		map[string]interface{}{
+			"files":  editorsQuery.editors,
+			"status": "online",
+		},
+	}
+	fmt.Println("after...", liveResponse)
+	marshalledResponse, _ := json.Marshal(&liveResponse)
+
+	m := Message{
+		"",
+		user.Id,
+		marshalledResponse,
+	}
+
+	if user.Role == "teacher" {
+		class.toTeacherInMenu <- &m
+	} else {
+		class.toStudentsInMenu <- &m
+	}
+
+	go client.writePump()
+
+	for {
+		wsPayload := struct {
+			Type      string `json:"type"`
+			Content   string `json:"content"`
+			NewStatus bool   `json:"newStatus"`
+		}{}
+		//wsResponse := WSResponse{}
+
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("closed")
+
+			if user.Role == "teacher" {
+				class.unRegisterTeacherInMenu <- &client
+			} else {
+				class.unRegisterStudentInMenu <- &client
+			}
+
+			break
+		}
+
+		if err := json.Unmarshal(msg, &wsPayload); err != nil {
+			conn.WriteMessage(t, []byte("\"bad payload\""))
+			continue
+		}
+
+		fmt.Println(wsPayload)
+
+		// TODO: update cases
+		switch wsPayload.Type {
+		case "add-file":
+		}
 	}
 }
 

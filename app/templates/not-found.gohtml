@@ -6,8 +6,17 @@
 		</div>
 </header>
 
-<h2 class="alert alert-info text-center">404 - Cette page n'est pas disponible 😑</h2>
-<div class="text-center" style="font-size: 15px;">
-	<a type="button" href="#" onclick="history.go(-1)"><span class="glyphicon glyphicon-menu-left"></span> Retourner en arrière</a>
-</div>
+{{if .minimal}}
+	<h2 class="alert alert-info text-center">Ce fichier est maintenant privé... 😑</h2>
+	<script>
+		setTimeout(() => {
+			window.parent.removeLightbox()
+		}, 5000)
+	</script>
+{{else}}
+	<h2 class="alert alert-info text-center">404 - Cette page n'est pas disponible 😑</h2>
+	<div class="text-center" style="font-size: 15px;">
+		<a type="button" href="#" onclick="history.go(-1)"><span class="glyphicon glyphicon-menu-left"></span> Retourner en arrière</a>
+	</div>
+{{end}}
 {{end}}
