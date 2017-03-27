@@ -75,19 +75,20 @@
 		</span>
 		<ul class="filesList">
 			{{range .group.Files.TeacherFiles}}
-				<li>
-					<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
+				<li id="file-{{.Id}}">
+					<a href="/groups/{{$.group.Id}}/file/{{.Id}}">
 						<div class="group file 	{{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}no-bottom-border-radius{{end}}">
 							<button class="peek btn btn-info {{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}no-bottom-right-border-radius{{end}}"><span class="glyphicon glyphicon-search"></span></button>
 							<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
 							<h4>
 								{{.Name}}
 								{{if eq $.role "teacher"}}
-									({{if .IsPrivate}}privé{{else}}public{{end}})
+									(<span class="file-isPrivate">{{if .IsPrivate}}privé{{else}}public{{end}}</span>)
 								{{end}}
 							</h4>
-							taille: {{.Size}} <br>
-							dernière modif: {{.LastModified}} <br>
+							<h5 class="live">LIVE <span class="file-status true"></span></h5>
+							taille: <span class="file-size">{{.Size}}</span> <br>
+							dernière modif: <span class="file-lastModified">{{.LastModified}}</span> <br>
 						</div>
 					</a>
 					{{if and (eq $.role "student") (not (index .ClonedBy $.userId))}}
@@ -129,19 +130,20 @@
 				</span>
 				<ul class="filesList">
 					{{range (index $.group.Files.StudentFiles .)}}
-						<li>
-							<a href="/groups/{{$.group.Id}}/files/{{.Id}}">
+						<li id="file-{{.Id}}">
+							<a href="/groups/{{$.group.Id}}/file/{{.Id}}">
 								<div class="group file">
 									<button class="peek btn btn-info"><span class="glyphicon glyphicon-search"></span></button>
 									<span class="glyphicon glyphicon-chevron-right group-chevron"></span>
 									<h4>
 										{{.Name}}
 										{{if eq $.role "student"}}
-											({{if .IsPrivate}}privé{{else}}public{{end}})
+											(<span class="file-isPrivate">{{if .IsPrivate}}privé{{else}}public{{end}}</span>)
 										{{end}}
 									</h4>
-									taille: {{.Size}} <br>
-									dernière modif: {{.LastModified}}
+									<h5 class="live">LIVE <span class="file-status true"></span></h5>
+									taille: <span class="file-size">{{.Size}}</span> <br>
+									dernière modif: <span class="file-lastModified">{{.LastModified}}</span> <br>
 								</div>
 							</a>
 						</li>

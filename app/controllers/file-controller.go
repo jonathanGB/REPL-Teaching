@@ -63,9 +63,10 @@ func (fc *FileController) ShowGroupFiles(c *gin.Context) {
 
 	files := fc.model.GetGroupFiles(gInfo.Teacher, gInfo.Id, user.Id, user.Role)
 	c.HTML(http.StatusOK, "user-files", gin.H{
-		"title":  "Files list",
-		"role":   user.Role,
-		"userId": user.Id.Hex(),
+		"title":     "Files list",
+		"filesMenu": true,
+		"role":      user.Role,
+		"userId":    user.Id.Hex(),
 		"group": gin.H{
 			"Id":      gInfo.Id.Hex(),
 			"Teacher": gInfo.TeacherName,
@@ -153,7 +154,7 @@ func (fc *FileController) CreateFile(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error":    nil,
-			"redirect": fmt.Sprintf("/groups/%s/files/%s", gId.Hex(), fId.Hex()),
+			"redirect": fmt.Sprintf("/groups/%s/file/%s", gId.Hex(), fId.Hex()),
 		})
 	}
 }
@@ -191,7 +192,7 @@ func (fc *FileController) IsFileVisible(c *gin.Context) {
 	if minimal != "" {
 		query = "?minimal=true"
 	}
-	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/files/%s", group.Id.Hex(), query))
+	c.Redirect(http.StatusSeeOther, fmt.Sprintf("/groups/%s/file/%s", group.Id.Hex(), query))
 }
 
 func (fc *FileController) IsFileOwner(status bool) gin.HandlerFunc {
@@ -278,7 +279,7 @@ func (fc *FileController) CloneFile(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"error":    nil,
-			"redirect": fmt.Sprintf("/groups/%s/files/%s", gId.Hex(), fId.Hex()),
+			"redirect": fmt.Sprintf("/groups/%s/file/%s", gId.Hex(), fId.Hex()),
 		})
 	}
 }
@@ -295,6 +296,10 @@ func (fc *FileController) WSEditorOwner(c *gin.Context, class *Class) {
 	file := c.MustGet("file").(*models.File)
 	gId := c.MustGet("group").(*models.GroupInfo).Id
 
+	if !file.IsPrivate {
+		go class.alertEditorStatus("online", user.Role, file.Id)
+	}
+
 	for {
 		wsPayload := struct {
 			Type           string         `json:"type"`
@@ -307,6 +312,9 @@ func (fc *FileController) WSEditorOwner(c *gin.Context, class *Class) {
 		t, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("closed")
+			if !file.IsPrivate {
+				class.alertEditorStatus("offline", user.Role, file.Id)
+			}
 			conn.Close()
 			break
 		}
@@ -375,7 +383,6 @@ func (fc *FileController) WSEditorObserver(c *gin.Context, class *Class) {
 
 	client := Client{
 		class,
-		EDITOR_OBSERVER,
 		file.Id,
 		user.Id,
 		conn,
@@ -396,7 +403,8 @@ func (fc *FileController) WSEditorObserver(c *gin.Context, class *Class) {
 		t, msg, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println("closed")
-			conn.Close()
+			class.unRegisterEditorObserver <- &client
+
 			break
 		}
 
@@ -423,6 +431,98 @@ func (fc *FileController) WSEditorObserver(c *gin.Context, class *Class) {
 		}
 		marshalledResponse, _ := json.Marshal(&wsResponse)
 		client.send <- marshalledResponse
+	}
+}
+
+func (fc *FileController) WSInMenu(c *gin.Context, class *Class) {
+	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println("Error connecting websocket %+v", err)
+		return
+	}
+
+	fmt.Println("connected in-menu")
+	user := c.MustGet("user").(*auth.PublicUser)
+
+	client := Client{
+		class,
+		"",
+		user.Id,
+		conn,
+		make(chan []byte),
+	}
+	editorsQuery := EditorQuery{
+		user.Role,
+		make([]string, 0),
+		make(chan bool, 1),
+	}
+
+	if user.Role == "teacher" {
+		class.registerTeacherInMenu <- &client
+	} else {
+		class.registerStudentInMenu <- &client
+	}
+
+	class.getPublicEditors <- &editorsQuery
+	<-editorsQuery.done
+
+	liveResponse := WSResponse{
+		"live-editing",
+		false,
+		map[string]interface{}{
+			"files":  editorsQuery.editors,
+			"status": "online",
+		},
+	}
+	fmt.Println("after...", liveResponse)
+	marshalledResponse, _ := json.Marshal(&liveResponse)
+
+	m := Message{
+		"",
+		user.Id,
+		marshalledResponse,
+	}
+
+	if user.Role == "teacher" {
+		class.toTeacherInMenu <- &m
+	} else {
+		class.toStudentsInMenu <- &m
+	}
+
+	go client.writePump()
+
+	for {
+		wsPayload := struct {
+			Type      string `json:"type"`
+			Content   string `json:"content"`
+			NewStatus bool   `json:"newStatus"`
+		}{}
+		//wsResponse := WSResponse{}
+
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			fmt.Println("closed")
+
+			if user.Role == "teacher" {
+				class.unRegisterTeacherInMenu <- &client
+			} else {
+				class.unRegisterStudentInMenu <- &client
+			}
+
+			break
+		}
+
+		if err := json.Unmarshal(msg, &wsPayload); err != nil {
+			conn.WriteMessage(t, []byte("\"bad payload\""))
+			continue
+		}
+
+		fmt.Println(wsPayload)
+
+		// TODO: update cases
+		switch wsPayload.Type {
+		case "add-file":
+		}
 	}
 }
 

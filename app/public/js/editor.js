@@ -123,7 +123,7 @@ console.log(payload.data.row, payload.data.column)
 					} else if (isOwner) {
 						that.data('status', newStatus)
 						that.children('.status-text').text(!newStatus ? "Public" : "Privé").siblings('.file-status').removeClass(`${!newStatus}`).addClass(`${newStatus}`)
-					} else if (newStatus) {
+					} else if (payload.data.newStatus) {
 						toastr.error("Le fichier est rendu privé", "", {timeOut: 0})
 					} else {
 						toastr.clear()

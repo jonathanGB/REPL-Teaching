@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"gopkg.in/mgo.v2/bson"
 	// "net/http"
@@ -21,12 +22,6 @@ const (
 	maxMessageSize = 512
 )
 
-const (
-	STUDENT_IN_MENU = iota
-	TEACHER_IN_MENU
-	EDITOR_OBSERVER
-)
-
 var (
 	newline = []byte{'\n'}
 	space   = []byte{' '}
@@ -41,8 +36,7 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	class *Class
 
-	clientType int // iotas defined in the const
-	fId, uId   bson.ObjectId
+	fId, uId bson.ObjectId
 
 	// The websocket connection.
 	conn *websocket.Conn
@@ -83,15 +77,16 @@ type Client struct {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) writePump() {
-	ticker := time.NewTicker(pingPeriod)
+	/*ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
 		c.conn.Close()
-	}()
+	}()*/
 	for {
 		select {
 		case message, ok := <-c.send:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			fmt.Println("newww messsage incoming")
+			//c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -99,12 +94,13 @@ func (c *Client) writePump() {
 			}
 
 			c.conn.WriteMessage(websocket.TextMessage, message)
-
-		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				return
-			}
+			fmt.Println("sent message!")
+			/*
+				case <-ticker.C:
+					c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+					if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+						return
+					}*/
 		}
 	}
 }

@@ -100,6 +100,17 @@ main {
 			width: 400px;
 			min-height: 86px;
 
+			.live {
+				opacity: 0;
+				transition: opacity 0.7s;
+			}
+
+			&.online {
+				.live {
+					opacity: 1;
+				}
+			}
+
 			&.no-bottom-border-radius {
 				border-radius: 10px 10px 0 0;
 			}
@@ -299,23 +310,23 @@ main.editor {
 	color: white;
 	font-size: 15px;
 	cursor: pointer;
+}
 
-	.file-status {
-		width: 20px;
-		height: 20px;
-		border-radius: 10px;
-		display: inline-block;
-		margin: 0 10px 0 4px;
-		vertical-align: middle;
-		transition: background-color 1s;
+.file-status {
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	display: inline-block;
+	margin: 0 10px 0 4px;
+	vertical-align: middle;
+	transition: background-color 1s;
 
-		&.true {
-			background: red;
-		}
+	&.true {
+		background: red;
+	}
 
-		&.false {
-			background: #92ef95;
-		}
+	&.false {
+		background: #92ef95;
 	}
 }
 

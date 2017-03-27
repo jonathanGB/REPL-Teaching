@@ -19,8 +19,22 @@ type WSResponse struct {
 	Err  bool        `json:"err"`
 	Data interface{} `json:"data"`
 }
+type EditorMessage struct {
+	Status string
+	FileId string
+	role   string
+}
+type EditorQuery struct {
+	role    string
+	editors []string
+	done    chan bool
+}
 type Hub map[bson.ObjectId]*Class // key is groupId
 type Class struct {
+	publicEditors    map[string][]string // key can be "teacher" or "students": maps to file ObjectId (Hex)
+	toPublicEditors  chan *EditorMessage // update publicEditors map
+	getPublicEditors chan *EditorQuery   // get all public editors
+
 	// every connection Client must be in one AND ONLY one of these 3 categories
 	// due to the iframe preview, any user can have 2 simultaneous ws connections: 1 in the editor and 1 in the menu
 	// editor and menu ws connections send/receive different data
@@ -64,6 +78,10 @@ func NewHub(s *mgo.Session) Hub {
 
 func (h Hub) registerClass(gId bson.ObjectId) {
 	class := &Class{
+		make(map[string][]string),
+		make(chan *EditorMessage),
+		make(chan *EditorQuery),
+
 		make(map[bson.ObjectId][]*Client),
 		make(map[bson.ObjectId]*Client),
 		nil,
@@ -85,11 +103,55 @@ func (h Hub) registerClass(gId bson.ObjectId) {
 	go class.run()
 }
 
+func (c *Class) alertEditorStatus(status, uRole string, fId bson.ObjectId) {
+	editorStatus := make(map[string]interface{})
+	editorStatus["files"] = []string{fId.Hex()}
+	editorStatus["status"] = status
+
+	liveResponse := WSResponse{
+		"live-editing",
+		false,
+		editorStatus,
+	}
+	jsonRes, err := json.Marshal(liveResponse)
+	if err != nil {
+		fmt.Println("Error decoding live-response json")
+		return
+	}
+
+	m := Message{
+		"",
+		"",
+		jsonRes,
+	}
+
+	editorM := EditorMessage{
+		status,
+		fId.Hex(),
+		uRole,
+	}
+
+	fmt.Println(status, uRole)
+
+	c.toPublicEditors <- &editorM
+
+	// alert others in menu of LIVE editing
+	if uRole == "teacher" {
+		c.toStudentsInMenu <- &m
+	} else {
+		c.toTeacherInMenu <- &m
+	}
+}
+
 func (c *Class) alertStatusUpdate(user *auth.PublicUser, fId bson.ObjectId, newStatus bool) {
+	data := make(map[string]interface{})
+	data["newStatus"] = newStatus
+	data["fId"] = fId
+
 	res := WSResponse{
 		"update-status",
 		false,
-		newStatus,
+		data,
 	}
 	jsonRes, err := json.Marshal(res)
 	if err != nil {
@@ -117,6 +179,7 @@ func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, new
 	metaData := make(map[string]interface{})
 	metaData["size"] = readableSize
 	metaData["lastModified"] = lastModified
+	metaData["fId"] = fId
 
 	allData := make(map[string]interface{})
 	allData["size"] = readableSize
@@ -183,7 +246,48 @@ func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, new
 
 func (c *Class) run() {
 	for {
+		fmt.Println(c)
 		select {
+		case message := <-c.toPublicEditors:
+			if message.role == "teacher" {
+				if message.Status == "online" {
+					c.publicEditors["teacher"] = []string{message.FileId}
+					continue
+				}
+
+				c.publicEditors["teacher"] = nil
+				continue
+			}
+
+			if message.Status == "online" {
+				c.publicEditors["students"] = append(c.publicEditors["students"], message.FileId)
+				continue
+			}
+
+			for i, student := range c.publicEditors["students"] {
+				if message.FileId == student {
+					c.publicEditors["students"] = append(c.publicEditors["students"][:i], c.publicEditors["students"][i+1:]...)
+					break
+				}
+			}
+		case response := <-c.getPublicEditors:
+			fmt.Println(c.publicEditors)
+			if response.role == "teacher" {
+				response.editors = make([]string, len(c.publicEditors["students"]))
+				copy(response.editors, c.publicEditors["students"])
+				response.done <- true
+				continue
+			}
+
+			teacher, _ := c.publicEditors["teacher"]
+			if len(teacher) > 0 {
+				fmt.Println(teacher)
+				response.editors = make([]string, 1)
+				copy(response.editors, teacher)
+				fmt.Println(response.editors)
+			}
+			response.done <- true
+
 		case client := <-c.registerEditorObserver:
 			observers, ok := c.editorObservers[client.fId]
 			if !ok {
@@ -229,7 +333,6 @@ func (c *Class) run() {
 				select {
 				case client.send <- message.Data:
 				default:
-					close(client.send)
 					observers = append(observers[:i], observers[i+1:]...)
 					i--
 				}
@@ -242,7 +345,6 @@ func (c *Class) run() {
 					select {
 					case client.send <- message.Data:
 					default:
-						close(client.send)
 						delete(c.studentsInMenu, key)
 					}
 				}
@@ -255,7 +357,6 @@ func (c *Class) run() {
 			select {
 			case client.send <- message.Data:
 			default:
-				close(client.send)
 				delete(c.studentsInMenu, message.uId)
 			}
 
@@ -266,7 +367,6 @@ func (c *Class) run() {
 			select {
 			case c.teacherInMenu.send <- message.Data:
 			default:
-				close(c.teacherInMenu.send)
 				c.teacherInMenu = nil
 			}
 		}

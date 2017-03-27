@@ -35,25 +35,29 @@ func GroupRoutes(router *gin.Engine, s *mgo.Session, hub controllers.Hub) {
 				files.POST("/", gc.IsGroupMember(true), fc.CreateFile)
 
 				// TODO: add ws handlers in the menu
+				files.GET("/ws", func(c *gin.Context) {
+					gId := c.MustGet("group").(*models.GroupInfo).Id
 
-				file := files.Group("/:fileId", fc.IsFileVisible)
-				{
-					file.GET("/", fc.ShowFile)
+					fc.WSInMenu(c, hub[gId])
+				})
+			}
+			file := group.Group("/file/:fileId", gc.IsGroupMember(true), fc.IsFileVisible)
+			{
+				file.GET("/", fc.ShowFile)
 
-					file.GET("/ws", func(c *gin.Context) {
-						uId := c.MustGet("user").(*auth.PublicUser).Id
-						fOwner := c.MustGet("file").(*models.File).Owner
-						gId := c.MustGet("group").(*models.GroupInfo).Id
+				file.GET("/ws", func(c *gin.Context) {
+					uId := c.MustGet("user").(*auth.PublicUser).Id
+					fOwner := c.MustGet("file").(*models.File).Owner
+					gId := c.MustGet("group").(*models.GroupInfo).Id
 
-						if uId == fOwner {
-							fc.WSEditorOwner(c, hub[gId])
-						} else {
-							fc.WSEditorObserver(c, hub[gId])
-						}
-					})
+					if uId == fOwner {
+						fc.WSEditorOwner(c, hub[gId])
+					} else {
+						fc.WSEditorObserver(c, hub[gId])
+					}
+				})
 
-					file.POST("/clone", auth.IsProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
-				}
+				file.POST("/clone", auth.IsProf(false, "json"), fc.IsFileOwner(false), fc.CloneFile)
 			}
 		}
 	}

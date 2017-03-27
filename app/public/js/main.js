@@ -156,6 +156,8 @@ $(function() {
 		})
 
 		$('iframe').on('load', function(e) {
+			if ($(this).attr('src') === "") return
+
 			$('iframe, .cover').fadeIn(600)
 		})
 
@@ -182,6 +184,7 @@ function removeLightbox(e) {
 	if (e) e.preventDefault()
 
 	$('iframe, .cover').fadeOut(600)
+	$('iframe').attr('src', '')
 }
 
 toastr.options = {
