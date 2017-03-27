@@ -1,10 +1,9 @@
 package controllers
 
 import (
-	"bytes"
 	"github.com/gorilla/websocket"
-	"log"
-	"net/http"
+	"gopkg.in/mgo.v2/bson"
+	// "net/http"
 	"time"
 )
 
@@ -22,6 +21,12 @@ const (
 	maxMessageSize = 512
 )
 
+const (
+	STUDENT_IN_MENU = iota
+	TEACHER_IN_MENU
+	EDITOR_OBSERVER
+)
+
 var (
 	newline = []byte{'\n'}
 	space   = []byte{' '}
@@ -34,7 +39,10 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
+	class *Class
+
+	clientType int // iotas defined in the const
+	fId, uId   bson.ObjectId
 
 	// The websocket connection.
 	conn *websocket.Conn
@@ -48,7 +56,7 @@ type Client struct {
 // The application runs readPump in a per-connection goroutine. The application
 // ensures that there is at most one reader on a connection by executing all
 // reads from this goroutine.
-func (c *Client) readPump() {
+/*func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
 		c.conn.Close()
@@ -67,7 +75,7 @@ func (c *Client) readPump() {
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 		c.hub.broadcast <- message
 	}
-}
+}*/
 
 // writePump pumps messages from the hub to the websocket connection.
 //
@@ -90,22 +98,8 @@ func (c *Client) writePump() {
 				return
 			}
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			w.Write(message)
+			c.conn.WriteMessage(websocket.TextMessage, message)
 
-			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
-
-			if err := w.Close(); err != nil {
-				return
-			}
 		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
@@ -113,17 +107,4 @@ func (c *Client) writePump() {
 			}
 		}
 	}
-}
-
-// serveWs handles websocket requests from the peer.
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	client.hub.register <- client
-	go client.writePump()
-	client.readPump()
 }

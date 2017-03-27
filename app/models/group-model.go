@@ -103,7 +103,7 @@ func (gm *GroupModel) JoinGroup(gId, userId bson.ObjectId) error {
 func (gm *GroupModel) GetAllGroupIds() []GroupId {
 	result := []GroupId{}
 
-	gm.db.C("groups").Find(nil).Select(bson.M{"_id": 1}).All(result)
+	gm.db.C("groups").Find(nil).Select(bson.M{"_id": 1}).All(&result)
 
 	return result
 }

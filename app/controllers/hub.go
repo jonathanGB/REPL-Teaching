@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/jonathanGB/REPL-Teaching/app/auth"
 	"github.com/jonathanGB/REPL-Teaching/app/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -10,6 +13,11 @@ type Message struct {
 	fId  bson.ObjectId
 	uId  bson.ObjectId
 	Data []byte
+}
+type WSResponse struct {
+	Type string      `json:"type"`
+	Err  bool        `json:"err"`
+	Data interface{} `json:"data"`
 }
 type Hub map[bson.ObjectId]*Class // key is groupId
 type Class struct {
@@ -26,19 +34,19 @@ type Class struct {
 	teacherInMenu   *Client                     // teacher in the menu
 
 	// send data to a specific class of Clients
-	toEditorObservers chan<- *Message
-	toStudentsInMenu  chan<- *Message
-	toTeacherInMenu   chan<- *Message
+	toEditorObservers chan *Message
+	toStudentsInMenu  chan *Message
+	toTeacherInMenu   chan *Message
 
 	// register a Client to a specific group
-	registerEditorObserver chan<- *Client
-	registerStudentInMenu  chan<- *Client
-	registerTeacherInMenu  chan<- *Client
+	registerEditorObserver chan *Client
+	registerStudentInMenu  chan *Client
+	registerTeacherInMenu  chan *Client
 
 	// unregister a Client to a specific group
-	unRegisterEditorObserver chan<- *Client
-	unRegisterStudentInMenu  chan<- *Client
-	unRegisterTeacherInMenu  chan<- *Client
+	unRegisterEditorObserver chan *Client
+	unRegisterStudentInMenu  chan *Client
+	unRegisterTeacherInMenu  chan *Client
 }
 
 func NewHub(s *mgo.Session) Hub {
@@ -48,24 +56,126 @@ func NewHub(s *mgo.Session) Hub {
 	gIds := gm.GetAllGroupIds()
 
 	for _, gId := range gIds {
-		h[gId.Id] = &Class{
-			make(map[bson.ObjectId][]*Client),
-			make(map[bson.ObjectId]*Client),
-			nil,
+		h.registerClass(gId.Id)
+	}
 
-			make(chan<- *Message),
-			make(chan<- *Message),
-			make(chan<- *Message),
+	return h
+}
 
-			make(chan<- *Client),
-			make(chan<- *Client),
-			make(chan<- *Client),
+func (h Hub) registerClass(gId bson.ObjectId) {
+	class := &Class{
+		make(map[bson.ObjectId][]*Client),
+		make(map[bson.ObjectId]*Client),
+		nil,
 
-			make(chan<- *Client),
-			make(chan<- *Client),
-			make(chan<- *Client),
+		make(chan *Message),
+		make(chan *Message),
+		make(chan *Message),
+
+		make(chan *Client),
+		make(chan *Client),
+		make(chan *Client),
+
+		make(chan *Client),
+		make(chan *Client),
+		make(chan *Client),
+	}
+	h[gId] = class
+
+	go class.run()
+}
+
+func (c *Class) alertStatusUpdate(user *auth.PublicUser, fId bson.ObjectId, newStatus bool) {
+	res := WSResponse{
+		"update-status",
+		false,
+		newStatus,
+	}
+	jsonRes, err := json.Marshal(res)
+	if err != nil {
+		fmt.Println("Error decoding update-status json")
+		return
+	}
+
+	m := Message{
+		fId,
+		user.Id,
+		jsonRes,
+	}
+
+	if user.Role == "teacher" { // alert all students
+		m.uId = ""
+	}
+
+	c.toEditorObservers <- &m
+	c.toTeacherInMenu <- &m
+	c.toStudentsInMenu <- &m
+}
+
+func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, newContent []byte, isPrivate bool, readableSize, lastModified string) {
+	// encode file update data (meta & all data separately)
+	metaData := make(map[string]interface{})
+	metaData["size"] = readableSize
+	metaData["lastModified"] = lastModified
+
+	allData := make(map[string]interface{})
+	allData["size"] = readableSize
+	allData["lastModified"] = lastModified
+	allData["content"] = newContent
+
+	// encode ws response
+	metaDataRes := WSResponse{
+		"update-content",
+		false,
+		metaData,
+	}
+	jsonMetaData, err := json.Marshal(metaDataRes)
+	if err != nil {
+		fmt.Println("Error decoding update-content json")
+		return
+	}
+
+	allDataRes := WSResponse{
+		"update-content",
+		false,
+		allData,
+	}
+	jsonAllData, err := json.Marshal(allDataRes)
+	if err != nil {
+		fmt.Println("Error decoding update-content json")
+		return
+	}
+
+	// prepare messages to send to channels
+	lightM := Message{
+		fId,
+		user.Id,
+		jsonMetaData,
+	}
+	allM := Message{
+		fId,
+		user.Id,
+		jsonAllData,
+	}
+
+	if user.Role == "teacher" {
+		lightM.uId = ""
+		allM.uId = ""
+
+		c.toTeacherInMenu <- &lightM
+	} else {
+		c.toStudentsInMenu <- &lightM
+	}
+
+	if !isPrivate {
+		c.toEditorObservers <- &allM
+
+		// share metadata to students if teacher, and to teacher if student
+		if user.Role == "teacher" {
+			c.toStudentsInMenu <- &lightM
+		} else {
+			c.toTeacherInMenu <- &lightM
 		}
-		go class.run()
 	}
 }
 
@@ -75,7 +185,7 @@ func (c *Class) run() {
 		case client := <-c.registerEditorObserver:
 			observers, ok := c.editorObservers[client.fId]
 			if !ok {
-				observers = make([]*Client)
+				observers = []*Client{}
 				c.editorObservers[client.fId] = observers
 			}
 			c.editorObservers[client.fId] = append(observers, client)
@@ -112,7 +222,7 @@ func (c *Class) run() {
 			if !ok {
 				continue
 			}
-			for i := 0; i < observers; i++ {
+			for i := 0; i < len(observers); i++ {
 				client := observers[i]
 				select {
 				case client.send <- message.Data:
