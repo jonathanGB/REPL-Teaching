@@ -12,7 +12,8 @@ $(function() {
 		rb: 'ruby',
 		exs: 'elixir'
 	}
-	let wsURL =`ws://${location.host}${location.pathname}ws`
+	let wsProtocol = location.protocol.includes("https") ? "wss" : "ws"
+	let wsURL =`${wsProtocol}://${location.host}${location.pathname}ws`
 	let isOwner = editorElem.data('isowner')
 
   editor.setTheme("ace/theme/monokai");

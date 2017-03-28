@@ -1,5 +1,6 @@
 $(function() {
-	let wsURL =`ws://${location.host}${location.pathname}ws`
+	let wsProtocol = location.protocol.includes("https") ? "wss" : "ws"
+	let wsURL =`${wsProtocol}://${location.host}${location.pathname}ws`
 
 	const socket = new WebSocket(wsURL)
 	socket.onopen = () => {
