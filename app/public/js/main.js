@@ -133,7 +133,7 @@ $(function() {
 			e.preventDefault()
 
 			let fId = $(this).data('clone')
-			fetch(`${location.pathname}${fId}/clone`, {
+			fetch(`${location.pathname.replace('/files/', '/file/')}${fId}/clone`, {
 				method: "POST",
 				credentials: "include",
 				body: new FormData(this)
