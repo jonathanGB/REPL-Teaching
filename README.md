@@ -31,6 +31,7 @@ Un professeur peut déployer pour sa classe des extraits (*snippets*) de code, q
 * Python
 * Ruby
 * Elixir
+* PHP
 
 #### Comment déployer
 Pour déployer localement, il est nécessaire d'avoir **Go** (`GOPATH` bien configuré aussi) et **MongoDB** d'installés (le dossier par défaut pour les données doit être utilisé `/data/db`). Un script `deploy.bash` permet ensuite d'installer automatiquement les dépendances **go** du projet, configurer la base de données, bâtir les images docker manquantes, et lancer le tout. Ce script est écrit pour les sytèmes **UN*X**.
