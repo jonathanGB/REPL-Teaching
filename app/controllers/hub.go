@@ -180,8 +180,6 @@ func (c *Class) alertContentUpdate(user *auth.PublicUser, fId bson.ObjectId, new
 	metaData["fId"] = fId
 
 	allData := make(map[string]interface{})
-	allData["size"] = readableSize
-	allData["lastModified"] = lastModified
 	allData["content"] = newContent
 	allData["row"] = cursorPosition["row"]
 	allData["column"] = cursorPosition["column"]

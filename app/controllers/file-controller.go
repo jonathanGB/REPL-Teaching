@@ -437,7 +437,7 @@ func (fc *FileController) WSEditorObserver(c *gin.Context, class *Class) {
 func (fc *FileController) WSInMenu(c *gin.Context, class *Class) {
 	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		fmt.Println("Error connecting websocket %+v", err)
+		fmt.Printf("Error connecting websocket %+v\n", err)
 		return
 	}
 
