@@ -1,4 +1,4 @@
-const ALLOWED_EXTENSIONS = new Set(["go", "js", "py", "rb", "exs"])
+const ALLOWED_EXTENSIONS = new Set(["go", "js", "py", "rb", "exs", "php"])
 
 
 $(function() {

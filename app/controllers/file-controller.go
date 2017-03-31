@@ -25,6 +25,7 @@ var (
 		"py":  true,
 		"rb":  true,
 		"exs": true,
+		"php": true,
 	}
 
 	wsupgrader = websocket.Upgrader{

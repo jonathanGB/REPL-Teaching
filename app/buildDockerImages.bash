@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -A runImages=( ["run-js"]="false" ["run-go"]="false" ["run-rb"]="false" ["run-py"]="false" ["run-exs"]="false" )
+declare -A runImages=( ["run-js"]="false" ["run-go"]="false" ["run-rb"]="false" ["run-py"]="false" ["run-exs"]="false" ["run-php"]="false" )
 
 buildDockerImages() {
 	builtImages=$(docker images | awk '$1 ~ /^run-/{print $1}')

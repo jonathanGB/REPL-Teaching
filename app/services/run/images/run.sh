@@ -13,6 +13,8 @@ getCommand() {
 		commandToRun="ruby"
 	elif [ $1 == "exs" ]; then
 		commandToRun="elixir"
+	elif [ $1 == "php" ]; then
+		commandToRun="php"
 	else
 		exit
 	fi

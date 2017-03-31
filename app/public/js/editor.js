@@ -10,7 +10,8 @@ $(function() {
 		go: 'golang',
 		py: 'python',
 		rb: 'ruby',
-		exs: 'elixir'
+		exs: 'elixir',
+		php: 'php',
 	}
 	let wsProtocol = location.protocol.includes("https") ? "wss" : "ws"
 	let wsURL =`${wsProtocol}://${location.host}${location.pathname}ws`
