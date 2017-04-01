@@ -111,7 +111,7 @@ $(function() {
 					} else {
 						editor.setValue(payload.data.content)
 						editor.gotoLine(payload.data.row + 1, payload.data.column, true)
-console.log(payload.data.row, payload.data.column)
+						editor.scrollToLine(payload.data.row + 1, true, true)
 						toastr.success("Fichier mis-à-jour!")
 					}
 
